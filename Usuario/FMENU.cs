@@ -27,6 +27,7 @@ namespace Usuario
         private UCUSUARIO ucusuario = null;
         private UCVENTA ucFVENTA = null;
         private UCCLIENTE uccliente = null;
+        private UCBUSCADOR ucBuscadorClientes = null;
         private Usuario.UCProducto ucproducto = null;
 
         // Campo para guardar la referencia al perfil abierto
@@ -323,10 +324,7 @@ namespace Usuario
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            toolStrip2.Visible = !toolStrip2.Visible;
-        }
+      
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e)
         {
@@ -361,10 +359,23 @@ namespace Usuario
             formBuscarFacturas.ShowDialog();
         }
 
-        private void btnClientes_Click(object sender, EventArgs e)
+        private void LlamaBuscador_Click(object sender, EventArgs e)
         {
-            var formBuscarClientes = new FBuscarClientes();
-            formBuscarClientes.ShowDialog();
+            // Si el UserControl ya está abierto, lo cerramos
+            if (ucBuscadorClientes != null && panelContenedor.Controls.Contains(ucBuscadorClientes))
+            {
+                panelContenedor.Controls.Remove(ucBuscadorClientes);
+                ucBuscadorClientes.Dispose();
+                ucBuscadorClientes = null;
+            }
+            else
+            {
+                // Si no está abierto, lo abrimos
+                AbrirUserControlExclusivo<UCBUSCADOR>(ref ucBuscadorClientes, panelContenedor);
+                ucBuscadorClientes.IniciarModoClientes(); // inicializa en modo Clientes
+            }
         }
+
+
     }
 }

@@ -110,6 +110,12 @@
     <Compile Include="melvin.Designer.cs">
       <DependentUpon>melvin.cs</DependentUpon>
     </Compile>
+    <Compile Include="UCBUSCADOR.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCBUSCADOR.Designer.cs">
+      <DependentUpon>UCBUSCADOR.cs</DependentUpon>
+    </Compile>
     <Compile Include="UCCLIENTE.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -179,6 +185,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FBuscarFactura.resx">
       <DependentUpon>FBuscarFactura.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCBUSCADOR.resx">
+      <DependentUpon>UCBUSCADOR.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UCCLIENTE.resx">
       <DependentUpon>UCCLIENTE.cs</DependentUpon>
