@@ -36,8 +36,9 @@
             // 
             // txtBuscarCliente
             // 
+            this.txtBuscarCliente.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.txtBuscarCliente.Location = new System.Drawing.Point(83, 142);
-            this.txtBuscarCliente.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtBuscarCliente.Margin = new System.Windows.Forms.Padding(2);
             this.txtBuscarCliente.Name = "txtBuscarCliente";
             this.txtBuscarCliente.Size = new System.Drawing.Size(694, 22);
             this.txtBuscarCliente.TabIndex = 0;
@@ -45,10 +46,11 @@
             // 
             // dgvClientes
             // 
+            this.dgvClientes.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.dgvClientes.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvClientes.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvClientes.Location = new System.Drawing.Point(83, 188);
-            this.dgvClientes.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dgvClientes.Margin = new System.Windows.Forms.Padding(2);
             this.dgvClientes.Name = "dgvClientes";
             this.dgvClientes.RowHeadersWidth = 82;
             this.dgvClientes.RowTemplate.Height = 33;
@@ -63,7 +65,7 @@
             this.Controls.Add(this.dgvClientes);
             this.Controls.Add(this.txtBuscarCliente);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "FBuscarClientes";
             this.Text = "FBuscarClientes";
             this.Load += new System.EventHandler(this.FBuscarClientes_Load);

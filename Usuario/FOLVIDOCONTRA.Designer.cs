@@ -47,10 +47,10 @@
             this.btnRecuperar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnRecuperar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRecuperar.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnRecuperar.Location = new System.Drawing.Point(25, 536);
-            this.btnRecuperar.Margin = new System.Windows.Forms.Padding(6);
+            this.btnRecuperar.Location = new System.Drawing.Point(17, 343);
+            this.btnRecuperar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnRecuperar.Name = "btnRecuperar";
-            this.btnRecuperar.Size = new System.Drawing.Size(194, 55);
+            this.btnRecuperar.Size = new System.Drawing.Size(129, 35);
             this.btnRecuperar.TabIndex = 6;
             this.btnRecuperar.Text = "Recuperar";
             this.btnRecuperar.UseVisualStyleBackColor = true;
@@ -60,10 +60,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(19, 401);
-            this.label2.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label2.Location = new System.Drawing.Point(13, 257);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(340, 33);
+            this.label2.Size = new System.Drawing.Size(217, 22);
             this.label2.TabIndex = 8;
             this.label2.Text = "Confirmar Contraseña:";
             // 
@@ -71,69 +71,69 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(21, 20);
-            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label1.Location = new System.Drawing.Point(14, 13);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(136, 33);
+            this.label1.Size = new System.Drawing.Size(86, 22);
             this.label1.TabIndex = 7;
             this.label1.Text = "Usuario:";
             // 
             // txtConfirmarContrasena
             // 
             this.txtConfirmarContrasena.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtConfirmarContrasena.Location = new System.Drawing.Point(27, 452);
-            this.txtConfirmarContrasena.Margin = new System.Windows.Forms.Padding(6);
+            this.txtConfirmarContrasena.Location = new System.Drawing.Point(18, 289);
+            this.txtConfirmarContrasena.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtConfirmarContrasena.Name = "txtConfirmarContrasena";
-            this.txtConfirmarContrasena.Size = new System.Drawing.Size(368, 41);
+            this.txtConfirmarContrasena.Size = new System.Drawing.Size(247, 28);
             this.txtConfirmarContrasena.TabIndex = 5;
             // 
             // txtUsuario
             // 
             this.txtUsuario.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtUsuario.Location = new System.Drawing.Point(29, 70);
-            this.txtUsuario.Margin = new System.Windows.Forms.Padding(6);
+            this.txtUsuario.Location = new System.Drawing.Point(19, 45);
+            this.txtUsuario.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtUsuario.Name = "txtUsuario";
-            this.txtUsuario.Size = new System.Drawing.Size(370, 41);
+            this.txtUsuario.Size = new System.Drawing.Size(248, 28);
             this.txtUsuario.TabIndex = 4;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(19, 262);
-            this.label3.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.label3.Location = new System.Drawing.Point(13, 168);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(286, 33);
+            this.label3.Size = new System.Drawing.Size(183, 22);
             this.label3.TabIndex = 11;
             this.label3.Text = "Nueva Contraseña:";
             // 
             // txtNuevaContrasena
             // 
             this.txtNuevaContrasena.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtNuevaContrasena.Location = new System.Drawing.Point(27, 314);
-            this.txtNuevaContrasena.Margin = new System.Windows.Forms.Padding(6);
+            this.txtNuevaContrasena.Location = new System.Drawing.Point(18, 201);
+            this.txtNuevaContrasena.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtNuevaContrasena.Name = "txtNuevaContrasena";
-            this.txtNuevaContrasena.Size = new System.Drawing.Size(368, 41);
+            this.txtNuevaContrasena.Size = new System.Drawing.Size(247, 28);
             this.txtNuevaContrasena.TabIndex = 10;
             // 
             // lblMensaje
             // 
             this.lblMensaje.AutoSize = true;
             this.lblMensaje.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMensaje.Location = new System.Drawing.Point(455, 20);
-            this.lblMensaje.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.lblMensaje.Location = new System.Drawing.Point(303, 13);
+            this.lblMensaje.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblMensaje.Name = "lblMensaje";
-            this.lblMensaje.Size = new System.Drawing.Size(69, 33);
+            this.lblMensaje.Size = new System.Drawing.Size(45, 22);
             this.lblMensaje.TabIndex = 13;
             this.lblMensaje.Text = "Pin:";
             // 
             // txtPin
             // 
             this.txtPin.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPin.Location = new System.Drawing.Point(461, 70);
-            this.txtPin.Margin = new System.Windows.Forms.Padding(6);
+            this.txtPin.Location = new System.Drawing.Point(307, 45);
+            this.txtPin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtPin.Name = "txtPin";
-            this.txtPin.Size = new System.Drawing.Size(176, 41);
+            this.txtPin.Size = new System.Drawing.Size(119, 28);
             this.txtPin.TabIndex = 12;
             // 
             // btnSolicitarPin
@@ -141,10 +141,10 @@
             this.btnSolicitarPin.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnSolicitarPin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSolicitarPin.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSolicitarPin.Location = new System.Drawing.Point(198, 139);
-            this.btnSolicitarPin.Margin = new System.Windows.Forms.Padding(6);
+            this.btnSolicitarPin.Location = new System.Drawing.Point(132, 89);
+            this.btnSolicitarPin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnSolicitarPin.Name = "btnSolicitarPin";
-            this.btnSolicitarPin.Size = new System.Drawing.Size(201, 55);
+            this.btnSolicitarPin.Size = new System.Drawing.Size(134, 35);
             this.btnSolicitarPin.TabIndex = 14;
             this.btnSolicitarPin.Text = "Solicitar Pin";
             this.btnSolicitarPin.UseVisualStyleBackColor = true;
@@ -155,10 +155,10 @@
             this.btnVerificar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnVerificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnVerificar.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnVerificar.Location = new System.Drawing.Point(461, 139);
-            this.btnVerificar.Margin = new System.Windows.Forms.Padding(6);
+            this.btnVerificar.Location = new System.Drawing.Point(307, 89);
+            this.btnVerificar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnVerificar.Name = "btnVerificar";
-            this.btnVerificar.Size = new System.Drawing.Size(176, 55);
+            this.btnVerificar.Size = new System.Drawing.Size(117, 35);
             this.btnVerificar.TabIndex = 18;
             this.btnVerificar.Text = "Verificar";
             this.btnVerificar.UseVisualStyleBackColor = true;
@@ -166,9 +166,9 @@
             // 
             // FOLVIDOCONTRA
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(660, 614);
+            this.ClientSize = new System.Drawing.Size(440, 393);
             this.Controls.Add(this.btnVerificar);
             this.Controls.Add(this.btnSolicitarPin);
             this.Controls.Add(this.lblMensaje);
@@ -180,8 +180,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtConfirmarContrasena);
             this.Controls.Add(this.txtUsuario);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(6);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MaximizeBox = false;
             this.Name = "FOLVIDOCONTRA";
             this.Text = "INSAVA";
             this.ResumeLayout(false);

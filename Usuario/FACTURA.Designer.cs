@@ -43,6 +43,7 @@
             // 
             // BtnNuevoCliente
             // 
+            this.BtnNuevoCliente.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnNuevoCliente.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnNuevoCliente.Location = new System.Drawing.Point(669, 52);
             this.BtnNuevoCliente.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -55,6 +56,7 @@
             // 
             // cmbMetodoPago
             // 
+            this.cmbMetodoPago.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbMetodoPago.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbMetodoPago.FormattingEnabled = true;
             this.cmbMetodoPago.Location = new System.Drawing.Point(659, 154);
@@ -74,6 +76,7 @@
             // 
             // lblTotalPagar
             // 
+            this.lblTotalPagar.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lblTotalPagar.Font = new System.Drawing.Font("Arial Rounded MT Bold", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTotalPagar.Location = new System.Drawing.Point(8, 485);
             this.lblTotalPagar.Name = "lblTotalPagar";
@@ -84,6 +87,7 @@
             // 
             // dgvFactura
             // 
+            this.dgvFactura.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.dgvFactura.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvFactura.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvFactura.Location = new System.Drawing.Point(13, 196);
@@ -96,6 +100,7 @@
             // 
             // cmbClientes
             // 
+            this.cmbClientes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbClientes.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbClientes.FormattingEnabled = true;
             this.cmbClientes.Location = new System.Drawing.Point(669, 18);
@@ -118,6 +123,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial Rounded MT Bold", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(757, 122);
@@ -128,6 +134,7 @@
             // 
             // btnGuardarVenta
             // 
+            this.btnGuardarVenta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGuardarVenta.Font = new System.Drawing.Font("Arial Rounded MT Bold", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuardarVenta.Location = new System.Drawing.Point(804, 458);
             this.btnGuardarVenta.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);

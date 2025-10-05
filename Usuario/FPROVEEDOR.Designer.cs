@@ -48,6 +48,7 @@
             // 
             // DGPROVEEDOR
             // 
+            this.DGPROVEEDOR.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.DGPROVEEDOR.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.DGPROVEEDOR.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.DGPROVEEDOR.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -60,15 +61,17 @@
             // 
             // txtNombreProveedor
             // 
+            this.txtNombreProveedor.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.txtNombreProveedor.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtNombreProveedor.Location = new System.Drawing.Point(23, 132);
-            this.txtNombreProveedor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtNombreProveedor.Margin = new System.Windows.Forms.Padding(4);
             this.txtNombreProveedor.Name = "txtNombreProveedor";
             this.txtNombreProveedor.Size = new System.Drawing.Size(420, 39);
             this.txtNombreProveedor.TabIndex = 49;
             // 
             // label3
             // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(17, 104);
@@ -80,12 +83,13 @@
             // 
             // btnEliminar
             // 
+            this.btnEliminar.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnEliminar.AutoSize = true;
             this.btnEliminar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnEliminar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEliminar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnEliminar.Location = new System.Drawing.Point(407, 195);
-            this.btnEliminar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnEliminar.Margin = new System.Windows.Forms.Padding(4);
             this.btnEliminar.Name = "btnEliminar";
             this.btnEliminar.Size = new System.Drawing.Size(191, 53);
             this.btnEliminar.TabIndex = 52;
@@ -95,12 +99,13 @@
             // 
             // btnEditar
             // 
+            this.btnEditar.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnEditar.AutoSize = true;
             this.btnEditar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEditar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnEditar.Location = new System.Drawing.Point(205, 195);
-            this.btnEditar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnEditar.Margin = new System.Windows.Forms.Padding(4);
             this.btnEditar.Name = "btnEditar";
             this.btnEditar.Size = new System.Drawing.Size(193, 53);
             this.btnEditar.TabIndex = 51;
@@ -110,12 +115,13 @@
             // 
             // btnGuardar
             // 
+            this.btnGuardar.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnGuardar.AutoSize = true;
             this.btnGuardar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGuardar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuardar.Location = new System.Drawing.Point(605, 195);
-            this.btnGuardar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnGuardar.Margin = new System.Windows.Forms.Padding(4);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(196, 53);
             this.btnGuardar.TabIndex = 53;
@@ -125,12 +131,13 @@
             // 
             // btnBuscar
             // 
+            this.btnBuscar.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnBuscar.AutoSize = true;
             this.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBuscar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBuscar.Location = new System.Drawing.Point(7, 195);
-            this.btnBuscar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnBuscar.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuscar.Name = "btnBuscar";
             this.btnBuscar.Size = new System.Drawing.Size(191, 53);
             this.btnBuscar.TabIndex = 50;
@@ -140,6 +147,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(16, 26);
@@ -151,10 +159,11 @@
             // 
             // checkactivo
             // 
+            this.checkactivo.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.checkactivo.AutoSize = true;
             this.checkactivo.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkactivo.Location = new System.Drawing.Point(492, 138);
-            this.checkactivo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkactivo.Margin = new System.Windows.Forms.Padding(4);
             this.checkactivo.Name = "checkactivo";
             this.checkactivo.Size = new System.Drawing.Size(102, 30);
             this.checkactivo.TabIndex = 242;
@@ -163,12 +172,13 @@
             // 
             // btnClean
             // 
+            this.btnClean.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnClean.AutoSize = true;
             this.btnClean.FlatAppearance.MouseDownBackColor = System.Drawing.Color.LimeGreen;
             this.btnClean.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClean.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClean.Location = new System.Drawing.Point(809, 195);
-            this.btnClean.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnClean.Margin = new System.Windows.Forms.Padding(4);
             this.btnClean.Name = "btnClean";
             this.btnClean.Size = new System.Drawing.Size(121, 53);
             this.btnClean.TabIndex = 246;
@@ -177,24 +187,27 @@
             // 
             // comboIDProveedor
             // 
+            this.comboIDProveedor.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.comboIDProveedor.FormattingEnabled = true;
             this.comboIDProveedor.Location = new System.Drawing.Point(20, 52);
-            this.comboIDProveedor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboIDProveedor.Margin = new System.Windows.Forms.Padding(4);
             this.comboIDProveedor.Name = "comboIDProveedor";
             this.comboIDProveedor.Size = new System.Drawing.Size(421, 24);
             this.comboIDProveedor.TabIndex = 248;
             // 
             // txtTelefonoProveedor
             // 
+            this.txtTelefonoProveedor.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.txtTelefonoProveedor.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTelefonoProveedor.Location = new System.Drawing.Point(492, 52);
-            this.txtTelefonoProveedor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtTelefonoProveedor.Margin = new System.Windows.Forms.Padding(4);
             this.txtTelefonoProveedor.Name = "txtTelefonoProveedor";
             this.txtTelefonoProveedor.Size = new System.Drawing.Size(420, 39);
             this.txtTelefonoProveedor.TabIndex = 249;
             // 
             // label1
             // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(487, 24);
@@ -206,9 +219,10 @@
             // 
             // cboFiltroActivo
             // 
+            this.cboFiltroActivo.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.cboFiltroActivo.FormattingEnabled = true;
             this.cboFiltroActivo.Location = new System.Drawing.Point(850, 286);
-            this.cboFiltroActivo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cboFiltroActivo.Margin = new System.Windows.Forms.Padding(2);
             this.cboFiltroActivo.Name = "cboFiltroActivo";
             this.cboFiltroActivo.Size = new System.Drawing.Size(82, 24);
             this.cboFiltroActivo.TabIndex = 251;
