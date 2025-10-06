@@ -16,12 +16,6 @@ namespace Usuario
         {
             InitializeComponent();
         }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
            
@@ -34,8 +28,6 @@ namespace Usuario
             // Mostrar el login
             login.ShowDialog();
 
-            // Cuando se cierre el login, se cierra la pantalla de inicio también
-            this.Close();
         }
 
         

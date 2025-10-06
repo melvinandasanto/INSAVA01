@@ -116,5 +116,10 @@ namespace Usuario
         {
             AbrirOlvidoContraseña();
         }
+
+        private void txtUsuario_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
