@@ -210,7 +210,7 @@
     <EmbeddedResource Include="FOLVIDOCONTRA.resx">
       <DependentUpon>FOLVIDOCONTRA.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FUSUARIO.resx">
+    <EmbeddedResource Include="UCUSUARIO.resx">
       <DependentUpon>UCUSUARIO.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UCVENTA.resx">
