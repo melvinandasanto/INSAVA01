@@ -11,7 +11,7 @@ namespace Usuario
     {
         private ClasePRODUCTO producto;
         private Dictionary<string, object> valoresOriginales;
-        private List<TextBox> CamposNumericos;
+        private List<TextBox> CamposDecimales;
 
         public UCProducto()
         {
@@ -38,12 +38,13 @@ namespace Usuario
             CBProveedor.SelectedIndexChanged += ControlModificado;
             checkactivo.CheckedChanged += ControlModificado;
             EstadoInicial();
-            CamposNumericos = new List<TextBox>
+            CamposDecimales = new List<TextBox>
             {
                 txtPrecioUnitario,
                 txtGerminacion
             };
-            CamposNumericos.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoNumerico(ev));
+            // Fix for the CS7036 error: Pass the required "txt" parameter to the ValidarCampoDecimal method.
+            CamposDecimales.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoDecimal(ev, campo));
         }
 
         private void CargarProductos()
@@ -127,14 +128,14 @@ namespace Usuario
                     MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
                     return;
                 }
-                // Si el usuario pone 45, se guarda como 0.45
-                if (germ > 1m) germ = germ / 100m;
                 if (germ < 0m || germ > 1m)
                 {
-                    MessageBox.Show("La germinación debe estar entre 0 y 1 (o entre 0 y 100 como porcentaje).");
+                    MessageBox.Show("La germinación debe ser un número decimal entre 0 y 1 (por ejemplo, 0.85 para 85%).");
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
+
+
             }
             else // Producto
             {
@@ -201,14 +202,13 @@ namespace Usuario
                     MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
                     return;
                 }
-                // Si el usuario pone 45, se guarda como 0.45
-                if (germ > 1m) germ = germ / 100m;
                 if (germ < 0m || germ > 1m)
                 {
-                    MessageBox.Show("La germinación debe estar entre 0 y 1 (o entre 0 y 100 como porcentaje).");
+                    MessageBox.Show("La germinación debe ser un número decimal entre 0 y 1 (por ejemplo, 0.85 para 85%).");
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
+
             }
             else // Producto
             {
@@ -488,5 +488,14 @@ namespace Usuario
                 CargarProductosFiltro(cboFiltroActivo.SelectedItem.ToString());
         }
 
+        private void aggprovj_Click(object sender, EventArgs e)
+        {
+            using (var formProveedor = new FPROVEEDOR())
+            {
+                formProveedor.ShowDialog();
+                // Si quieres recargar la lista de proveedores después de agregar uno nuevo:
+                CargarProveedores();
+            }
+        }
     }
 }
