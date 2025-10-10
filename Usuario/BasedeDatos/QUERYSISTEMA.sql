@@ -106,7 +106,7 @@ GO
 CREATE TABLE PRODUCTO (
     IDProducto INT IDENTITY(1,1) PRIMARY KEY,
     Categoria VARCHAR(50) NOT NULL,
-    Nombre VARCHAR(MAX) NOT NULL,
+    Nombre VARCHAR(100) NOT NULL,
     Cantidad DECIMAL(10,2) NOT NULL DEFAULT 0,
     PrecioUnitario DECIMAL(10,2) NOT NULL DEFAULT 0,
     PorcentajeGerminacion DECIMAL(4,2) CHECK (PorcentajeGerminacion BETWEEN 0 AND 1),
@@ -116,7 +116,7 @@ CREATE TABLE PRODUCTO (
         REFERENCES PROVEEDOR(IDProveedor),
     CONSTRAINT CK_Producto_PorcentajeGerminacion_Semilla
 CHECK (
-    (Categoria IN ('Semilla') AND PorcentajeGerminacion IS NOT NULL)
+    (Categoria IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NOT NULL)
     OR
     (Categoria = 'Producto')
     )

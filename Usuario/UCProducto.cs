@@ -20,6 +20,7 @@ namespace Usuario
             this.Load += UCProducto_Load;
             // Asegura que el evento esté asignado
             this.NUPCantidad.ValueChanged += new System.EventHandler(this.ControlModificado);
+
         }
 
         private void UCProducto_Load(object sender, EventArgs e)
@@ -45,6 +46,7 @@ namespace Usuario
             };
             // Fix for the CS7036 error: Pass the required "txt" parameter to the ValidarCampoDecimal method.
             CamposDecimales.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoDecimal(ev, campo));
+            txtGerminacion.Enabled = false;
         }
 
         private void CargarProductos()
@@ -122,6 +124,7 @@ namespace Usuario
             // Validación y conversión del porcentaje de germinación
             if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
             {
+                txtGerminacion.Enabled = true;
                 string textoGerminacion = txtGerminacion.Text.Trim();
                 if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
                 {
@@ -135,11 +138,10 @@ namespace Usuario
                 }
                 producto.PorcentajeGerminacion = germ;
 
-
             }
-            else // Producto
+            else
             {
-                producto.PorcentajeGerminacion = 0; // O NULL si tu clase lo permite
+                txtGerminacion.Enabled = false;
             }
 
             // Proveedor robusto
