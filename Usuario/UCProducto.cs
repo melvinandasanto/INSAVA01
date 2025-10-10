@@ -109,20 +109,37 @@ namespace Usuario
             producto.Nombre = CBProducto.Text;
             producto.Cantidad = NUPCantidad.Value;
 
-            // Solo enteros para precio unitario
-            if (!decimal.TryParse(txtPrecioUnitario.Text, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
+            // Validación flexible para Precio Unitario (acepta entero o decimal)
+            string textoPrecio = txtPrecioUnitario.Text.Trim();
+            if (!decimal.TryParse(textoPrecio, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
             {
-                MessageBox.Show("El precio unitario debe ser un número decimal válido.");
+                MessageBox.Show("El precio unitario debe ser un número válido (entero o decimal).");
                 return;
             }
             producto.PrecioUnitario = precio;
 
-            if (!decimal.TryParse(txtGerminacion.Text, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+            // Validación y conversión del porcentaje de germinación
+            if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
             {
-                MessageBox.Show("La germinación debe ser un número decimal válido.");
-                return;
+                string textoGerminacion = txtGerminacion.Text.Trim();
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+                {
+                    MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
+                    return;
+                }
+                // Si el usuario pone 45, se guarda como 0.45
+                if (germ > 1m) germ = germ / 100m;
+                if (germ < 0m || germ > 1m)
+                {
+                    MessageBox.Show("La germinación debe estar entre 0 y 1 (o entre 0 y 100 como porcentaje).");
+                    return;
+                }
+                producto.PorcentajeGerminacion = germ;
             }
-            producto.PorcentajeGerminacion = germ;
+            else // Producto
+            {
+                producto.PorcentajeGerminacion = 0; // O NULL si tu clase lo permite
+            }
 
             // Proveedor robusto
             object proveedorValue = CBProveedor.SelectedValue;
@@ -137,17 +154,24 @@ namespace Usuario
 
             producto.Activo = checkactivo.Checked;
 
-            if (producto.Guardar())
+            try
             {
-                MessageBox.Show("Producto guardado correctamente.");
-                CargarProductos();
-                EstadoInicial();
-                LimpiarCampos();
+                if (producto.Guardar())
+                {
+                    MessageBox.Show("Producto guardado correctamente.");
+                    CargarProductos();
+                    EstadoInicial();
+                    LimpiarCampos();
+                }
+                else
+                {
+                    MessageBox.Show("Error al guardar el producto. Revisa los datos y restricciones de la base de datos.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Error al guardar el producto.");
-            }
+                   MessageBox.Show("Error técnico: " + ex.Message);
+               }
         }
 
         private void btnEditar_Click(object sender, EventArgs e)
@@ -159,20 +183,37 @@ namespace Usuario
             producto.Nombre = CBProducto.Text;
             producto.Cantidad = NUPCantidad.Value;
 
-            // Solo enteros para precio unitario
-            if (!decimal.TryParse(txtPrecioUnitario.Text, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
+            // Validación flexible para Precio Unitario (acepta entero o decimal)
+            string textoPrecio = txtPrecioUnitario.Text.Trim();
+            if (!decimal.TryParse(textoPrecio, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
             {
-                MessageBox.Show("El precio unitario debe ser un número decimal válido.");
+                MessageBox.Show("El precio unitario debe ser un número válido (entero o decimal).");
                 return;
             }
             producto.PrecioUnitario = precio;
 
-            if (!decimal.TryParse(txtGerminacion.Text, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+            // Validación y conversión del porcentaje de germinación
+            if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
             {
-                MessageBox.Show("La germinación debe ser un número decimal válido.");
-                return;
+                string textoGerminacion = txtGerminacion.Text.Trim();
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+                {
+                    MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
+                    return;
+                }
+                // Si el usuario pone 45, se guarda como 0.45
+                if (germ > 1m) germ = germ / 100m;
+                if (germ < 0m || germ > 1m)
+                {
+                    MessageBox.Show("La germinación debe estar entre 0 y 1 (o entre 0 y 100 como porcentaje).");
+                    return;
+                }
+                producto.PorcentajeGerminacion = germ;
             }
-            producto.PorcentajeGerminacion = germ;
+            else // Producto
+            {
+                producto.PorcentajeGerminacion = 0; // O NULL si tu clase lo permite
+            }
 
             // Proveedor robusto
             object proveedorValue = CBProveedor.SelectedValue;
