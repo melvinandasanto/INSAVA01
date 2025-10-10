@@ -115,8 +115,11 @@ CREATE TABLE PRODUCTO (
     CONSTRAINT FK_Producto_Proveedor FOREIGN KEY (IDProveedor)
         REFERENCES PROVEEDOR(IDProveedor),
     CONSTRAINT CK_Producto_PorcentajeGerminacion_Semilla
-CHECK
+CHECK (
     (Categoria IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NOT NULL)
+    OR
+    (Categoria NOT IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NULL)
+)
 );
 GO
 

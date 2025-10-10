@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Windows.Forms;
 using Usuario.Clases;
+using System.Globalization;
 
 namespace Usuario
 {
@@ -18,7 +19,7 @@ namespace Usuario
         private string _descripcion;
         private decimal _cantidad;
         private decimal _precioUnitario;
-        private decimal _porcentajeGerminacion;
+        private decimal? _porcentajeGerminacion;
         private int? _idProveedor;
         private bool _activo;
 
@@ -73,11 +74,7 @@ namespace Usuario
             set => _precioUnitario = value;
         }
 
-        public decimal PorcentajeGerminacion
-        {
-            get => _porcentajeGerminacion;
-            set => _porcentajeGerminacion = value;
-        }
+        public decimal? PorcentajeGerminacion { get; set; }
 
         public int? IDProveedor
         {

@@ -25,6 +25,7 @@ namespace Usuario
 
         private void UCProducto_Load(object sender, EventArgs e)
         {
+            txtGerminacion.Enabled = false;
             CargarProductos();
             CargarProveedores();
             CargarCategorias();
@@ -46,7 +47,8 @@ namespace Usuario
             };
             // Fix for the CS7036 error: Pass the required "txt" parameter to the ValidarCampoDecimal method.
             CamposDecimales.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoDecimal(ev, campo));
-            txtGerminacion.Enabled = false;
+            
+            CBCategoria.SelectedIndexChanged += CBCategoria_SelectedIndexChanged;
         }
 
         private void CargarProductos()
@@ -122,13 +124,13 @@ namespace Usuario
             producto.PrecioUnitario = precio;
 
             // Validación y conversión del porcentaje de germinación
-            if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
+            if (CBCategoria.Text.Equals("Semilla", StringComparison.OrdinalIgnoreCase) ||
+                CBCategoria.Text.Equals("Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
             {
-                txtGerminacion.Enabled = true;
-                string textoGerminacion = txtGerminacion.Text.Trim();
-                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+                string textoGerminacion = txtGerminacion.Text.Trim().Replace(',', '.');
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal germ))
                 {
-                    MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
+                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85).");
                     return;
                 }
                 if (germ < 0m || germ > 1m)
@@ -137,11 +139,10 @@ namespace Usuario
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
-
             }
             else
             {
-                txtGerminacion.Enabled = false;
+                producto.PorcentajeGerminacion = null; // Si tu clase permite null, usa null
             }
 
             // Proveedor robusto
@@ -198,10 +199,10 @@ namespace Usuario
             // Validación y conversión del porcentaje de germinación
             if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
             {
-                string textoGerminacion = txtGerminacion.Text.Trim();
-                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal germ))
+                string textoGerminacion = txtGerminacion.Text.Trim().Replace(',', '.');
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal germ))
                 {
-                    MessageBox.Show("La germinación debe ser un número válido (entero o decimal).");
+                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85).");
                     return;
                 }
                 if (germ < 0m || germ > 1m)
@@ -214,7 +215,7 @@ namespace Usuario
             }
             else // Producto
             {
-                producto.PorcentajeGerminacion = 0; // O NULL si tu clase lo permite
+                producto.PorcentajeGerminacion = null; // O NULL si tu clase lo permite
             }
 
             // Proveedor robusto
@@ -497,6 +498,22 @@ namespace Usuario
                 formProveedor.ShowDialog();
                 // Si quieres recargar la lista de proveedores después de agregar uno nuevo:
                 CargarProveedores();
+            }
+        }
+
+        private void CBCategoria_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string categoria = CBCategoria.Text.Trim();
+            if (categoria.Equals("Semilla", StringComparison.OrdinalIgnoreCase) ||
+                categoria.Equals("Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+            {
+                txtGerminacion.Enabled = true;
+                txtGerminacion.Text = ""; // Limpia el campo para evitar valores residuales
+            }
+            else
+            {
+                txtGerminacion.Enabled = false;
+                txtGerminacion.Text = ""; // Limpia el campo
             }
         }
     }
