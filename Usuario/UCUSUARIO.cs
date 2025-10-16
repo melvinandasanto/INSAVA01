@@ -86,7 +86,7 @@ namespace Usuario
             cboFiltroActivo.Items.Add("Activos");
             cboFiltroActivo.Items.Add("Inactivos");
             cboFiltroActivo.Items.Add("Todos");
-            cboFiltroActivo.SelectedIndex = 0; // Por defecto Activos
+            cboFiltroActivo.SelectedIndex = 0; 
         }
 
         private void CargarUsuariosFiltro(string filtro)
@@ -113,29 +113,23 @@ namespace Usuario
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            // Ejecutar validación antes de guardar
+            if (!ValidarCampos())
+                return;
+
             usuario.NumeroIdentidad = CBRol.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(usuario.NumeroIdentidad))
-            {
-                MessageBox.Show("Debe ingresar el número de identidad.");
-                return;
-            }
-
-            if (usuario.NumeroIdentidad.Length != 13)
-            {
-                MessageBox.Show("El número de identidad debe tener exactamente 13 dígitos.");
-                return;
-            }
-
+            // Validar duplicado
             if (txtId.Text == "")
             {
                 if (usuario.ExistePorNumeroIdentidad(usuario.NumeroIdentidad))
                 {
-                    MessageBox.Show("Ya existe un usuario con este número de identidad. Use el botón Buscar para editarlo.");
+                    MessageBox.Show("Ya existe un usuario con este número de identidad. Use el botón Buscar para editarlo.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
+            // Asignar datos
             usuario.PrimerNombre = txtPrimerNombre.Text.Trim();
             usuario.SegundoNombre = txtSegundoNombre.Text.Trim();
             usuario.PrimerApellido = txtPrimerApellido.Text.Trim();
@@ -144,9 +138,10 @@ namespace Usuario
             usuario.IDRol = Convert.ToInt32(CBNOIdentidad.SelectedValue);
             usuario.Activo = checkactivo.Checked;
 
+            // Guardar
             if (usuario.Guardar())
             {
-                MessageBox.Show("Usuario guardado correctamente.");
+                MessageBox.Show("Usuario guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 CargarIdentidades();
                 CargarUsuarios();
                 EstadoInicial();
@@ -154,7 +149,7 @@ namespace Usuario
             }
             else
             {
-                MessageBox.Show("Error al guardar el usuario.");
+                MessageBox.Show("Error al guardar el usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -437,5 +432,57 @@ namespace Usuario
         }
 
 
-    }
+    
+        
+    private bool ValidarCampos()
+        {
+            // Validar Número de Identidad
+            if (string.IsNullOrWhiteSpace(CBRol.Text))
+            {
+                MessageBox.Show("Debe ingresar el número de identidad.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CBRol.Focus();
+                return false;
+            }
+
+            if (CBRol.Text.Length != 13)
+            {
+                MessageBox.Show("El número de identidad debe tener exactamente 13 dígitos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CBRol.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPrimerNombre.Text))
+            {
+                MessageBox.Show("Debe ingresar el primer nombre.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPrimerNombre.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPrimerApellido.Text))
+            {
+                MessageBox.Show("Debe ingresar el primer apellido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPrimerApellido.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtClave.Text))
+            {
+                MessageBox.Show("Debe ingresar una clave.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtClave.Focus();
+                return false;
+            }
+
+            if (CBNOIdentidad.SelectedIndex == -1)
+            {
+                MessageBox.Show("Debe seleccionar un rol.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CBNOIdentidad.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+    } // 🔹 Esta llave es la que cierra toda la clase UCUSUARIO
+
 }
+

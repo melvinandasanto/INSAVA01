@@ -516,5 +516,10 @@ namespace Usuario
                 txtGerminacion.Text = ""; // Limpia el campo
             }
         }
+
+        private void UCProducto_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
