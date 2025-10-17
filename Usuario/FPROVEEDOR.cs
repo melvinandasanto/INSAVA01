@@ -150,7 +150,7 @@ namespace Usuario
             {
                 if (proveedor.Guardar())
                 {
-                    MessageBox.Show("✅ Proveedor guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Proveedor guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     RefrescarGrid();
                     CargarProveedoresCombo();
 
