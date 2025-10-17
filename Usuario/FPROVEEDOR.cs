@@ -132,12 +132,16 @@ namespace Usuario
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtNombreProveedor.Text))
+            string mensaje;
+
+            // 🔍 Validar datos del proveedor usando la clase ClaseValidacion
+            if (!ClaseValidacion.ValidarProveedor(txtNombreProveedor.Text.Trim(), txtTelefonoProveedor.Text.Trim(), out mensaje))
             {
-                MessageBox.Show("Por favor, ingresa el nombre del proveedor.");
-                return;
+                MessageBox.Show(mensaje, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return; // Detiene el guardado si hay errores
             }
 
+            // Si pasa la validación, continuar con el guardado
             proveedor.NombreProveedor = txtNombreProveedor.Text.Trim();
             proveedor.TelefonoProveedor = txtTelefonoProveedor.Text.Trim();
             proveedor.Activo = checkactivo.Checked;
@@ -146,20 +150,27 @@ namespace Usuario
             {
                 if (proveedor.Guardar())
                 {
-                    MessageBox.Show("Proveedor guardado correctamente.");
+                    MessageBox.Show("✅ Proveedor guardado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     RefrescarGrid();
                     CargarProveedoresCombo();
+
+                    // Limpia los campos después de guardar
+                    txtNombreProveedor.Clear();
+                    txtTelefonoProveedor.Clear();
+                    checkactivo.Checked = false;
+                    comboIDProveedor.SelectedIndex = -1;
                 }
                 else
                 {
-                    MessageBox.Show("Error al guardar el proveedor.");
+                    MessageBox.Show("❌ Error al guardar el proveedor.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("⚠️ Error: " + ex.Message, "Excepción", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void btnClean_Click(object sender, EventArgs e)
         {

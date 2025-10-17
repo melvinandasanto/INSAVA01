@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Usuario.Clases;
 
 namespace Usuario
 {
@@ -13,7 +12,6 @@ namespace Usuario
         /// <summary>
         /// Permite solo dígitos numéricos (y teclas de control como borrar, flechas, etc.).
         /// </summary>
-        /// <param name="e">Evento KeyPress del control.</param>
         public static void ValidarCampoNumerico(KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
@@ -21,10 +19,10 @@ namespace Usuario
                 e.Handled = true;
             }
         }
+
         /// <summary>
         /// Permite solo letras (y teclas de control como borrar, flechas, etc.).
         /// </summary>
-        /// <param name="e">Evento KeyPress del control.</param>
         public static void ValidarCampoLetras(KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsLetter(e.KeyChar) && e.KeyChar != ' ')
@@ -32,22 +30,18 @@ namespace Usuario
                 e.Handled = true;
             }
         }
+
         /// <summary>
         /// Permite solo números decimales en el evento KeyPress.
         /// </summary>
-        /// <param name="e">Evento KeyPress del control.</param>
-        /// <param name="txt">El TextBox donde se está escribiendo.</param>
         public static void ValidarCampoDecimal(KeyPressEventArgs e, TextBox txt)
         {
-            // Permitir teclas de control (backspace, delete, etc.)
             if (char.IsControl(e.KeyChar))
                 return;
 
-            // Permitir dígitos
             if (char.IsDigit(e.KeyChar))
                 return;
 
-            // Permitir solo un punto decimal
             if (e.KeyChar == '.')
             {
                 if (txt.Text.Contains("."))
@@ -55,18 +49,17 @@ namespace Usuario
                 return;
             }
 
-            // Cualquier otro carácter no está permitido
             e.Handled = true;
         }
+
         /// <summary>
         /// Valida que un número decimal no sea negativo.
         /// </summary>
-        /// <param name="valor">El valor decimal a validar.</param>
-        /// <returns>True si el valor es negativo, false si es cero o positivo.</returns>
         public static bool EsNegativo(decimal valor)
         {
             return valor < 0;
         }
+
         /// <summary>
         /// Valida si una cadena es un correo electrónico válido.
         /// </summary>
@@ -83,6 +76,7 @@ namespace Usuario
                 return false;
             }
         }
+
         /// <summary>
         /// Valida si una cadena es un número de teléfono válido (solo dígitos, longitud configurable).
         /// </summary>
@@ -92,6 +86,7 @@ namespace Usuario
             if (!telefono.All(char.IsDigit)) return false;
             return telefono.Length >= longitudMin && telefono.Length <= longitudMax;
         }
+
         /// <summary>
         /// Valida si una cadena cumple con una longitud mínima y máxima.
         /// </summary>
@@ -100,6 +95,7 @@ namespace Usuario
             if (texto == null) return false;
             return texto.Length >= min && texto.Length <= max;
         }
+
         /// <summary>
         /// Valida si una cadena está vacía o es nula.
         /// </summary>
@@ -107,6 +103,7 @@ namespace Usuario
         {
             return string.IsNullOrWhiteSpace(texto);
         }
+
         /// <summary>
         /// Valida si una contraseña es segura (mínimo 8 caracteres, mayúscula, minúscula, número y símbolo).
         /// </summary>
@@ -119,6 +116,7 @@ namespace Usuario
             bool tieneSimbolo = password.Any(ch => !char.IsLetterOrDigit(ch));
             return tieneMayus && tieneMinus && tieneNumero && tieneSimbolo;
         }
+
         /// <summary>
         /// Valida si una cadena es alfanumérica.
         /// </summary>
@@ -127,6 +125,7 @@ namespace Usuario
             if (string.IsNullOrWhiteSpace(texto)) return false;
             return texto.All(char.IsLetterOrDigit);
         }
+
         /// <summary>
         /// Valida si un número está dentro de un rango.
         /// </summary>
@@ -134,6 +133,7 @@ namespace Usuario
         {
             return valor >= min && valor <= max;
         }
+
         /// <summary>
         /// Valida si una fecha está en un rango.
         /// </summary>
@@ -141,6 +141,7 @@ namespace Usuario
         {
             return fecha >= min && fecha <= max;
         }
+
         /// <summary>
         /// Valida si un objeto es nulo.
         /// </summary>
@@ -149,6 +150,49 @@ namespace Usuario
             return obj == null;
         }
 
+        // ==========================================================
+        // ✅ NUEVA VALIDACIÓN: Validar datos del proveedor
+        // ==========================================================
+        /// <summary>
+        /// Valida los campos requeridos de un proveedor.
+        /// </summary>
+        /// <param name="nombre">Nombre del proveedor</param>
+        /// <param name="telefono">Teléfono del proveedor</param>
+        /// <param name="mensaje">Mensaje de error si hay algo incorrecto</param>
+        /// <returns>True si los datos son válidos, False si hay errores</returns>
+        public static bool ValidarProveedor(string nombre, string telefono, out string mensaje)
+        {
+            mensaje = "";
 
+            // Nombre vacío o nulo
+            if (EstaVacioONulo(nombre))
+            {
+                mensaje = "Por favor, ingrese el nombre del proveedor.";
+                return false;
+            }
+
+            // Longitud del nombre
+            if (!EsLongitudValida(nombre, 3, 50))
+            {
+                mensaje = "El nombre del proveedor debe tener entre 3 y 50 caracteres.";
+                return false;
+            }
+
+            // Teléfono vacío o nulo
+            if (EstaVacioONulo(telefono))
+            {
+                mensaje = "Por favor, ingrese el número de teléfono del proveedor.";
+                return false;
+            }
+
+            // Teléfono numérico y longitud correcta
+            if (!EsTelefonoValido(telefono, 8, 8))
+            {
+                mensaje = "El número de teléfono debe contener exactamente 8 dígitos numéricos.";
+                return false;
+            }
+
+            return true; // ✅ Todo correcto
+        }
     }
 }

@@ -453,13 +453,7 @@ namespace Usuario
                 return false;
             }
 
-            // Segundo apellido (si quieres obligatorio)
-            if (string.IsNullOrWhiteSpace(txtSegundoApellido.Text))
-            {
-                MessageBox.Show("Debe ingresar el segundo apellido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtSegundoApellido.Focus();
-                return false;
-            }
+         
 
             // Teléfono
             if (string.IsNullOrWhiteSpace(txtTelefono.Text))
