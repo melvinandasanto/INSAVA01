@@ -217,5 +217,10 @@ namespace Usuario
             if (DGPROVEEDOR.Columns.Contains("PrimerNombre"))
                 DGPROVEEDOR.Columns["PrimerNombre"].HeaderText = "Primer Nombre";
         }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
