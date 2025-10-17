@@ -15,8 +15,6 @@ namespace Usuario
         private int _idProducto;
         private string _categoria; // "Semilla" o "Producto"
         private string _nombre;
-        private string _variedad;
-        private string _descripcion;
         private decimal _cantidad;
         private decimal _precioUnitario;
         private decimal? _porcentajeGerminacion;
@@ -50,17 +48,6 @@ namespace Usuario
             set => _nombre = value;
         }
 
-        public string Variedad
-        {
-            get => _variedad;
-            set => _variedad = value;
-        }
-
-        public string Descripcion
-        {
-            get => _descripcion;
-            set => _descripcion = value;
-        }
 
         public decimal Cantidad
         {
@@ -74,7 +61,11 @@ namespace Usuario
             set => _precioUnitario = value;
         }
 
-        public decimal? PorcentajeGerminacion { get; set; }
+        public decimal? PorcentajeGerminacion
+        {
+            get => _porcentajeGerminacion;
+            set => _porcentajeGerminacion = value;
+        }
 
         public int? IDProveedor
         {
@@ -93,11 +84,9 @@ namespace Usuario
             _idProducto = 0;
             _categoria = "Producto";
             _nombre = string.Empty;
-            _variedad = string.Empty;
-            _descripcion = string.Empty;
             _cantidad = 0;
             _precioUnitario = 0;
-            _porcentajeGerminacion = 0;
+            _porcentajeGerminacion = null;
             _idProveedor = null;
             _activo = true;
         }
@@ -108,11 +97,12 @@ namespace Usuario
             {
                 ["Categoria"] = _categoria,
                 ["Nombre"] = _nombre,
-                ["Variedad"] = string.IsNullOrEmpty(_variedad) ? (object)DBNull.Value : _variedad,
-                ["Descripcion"] = string.IsNullOrEmpty(_descripcion) ? (object)DBNull.Value : _descripcion,
                 ["Cantidad"] = _cantidad,
                 ["PrecioUnitario"] = _precioUnitario,
-                ["PorcentajeGerminacion"] = _categoria == "Semilla" ? (object)_porcentajeGerminacion : DBNull.Value,
+                ["PorcentajeGerminacion"] = (string.Equals(_categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+                             ? (_porcentajeGerminacion.HasValue ? (object)_porcentajeGerminacion.Value : (object)DBNull.Value)
+                             : (object)DBNull.Value,
                 ["IDProveedor"] = _idProveedor.HasValue ? (object)_idProveedor.Value : DBNull.Value,
                 ["Activo"] = _activo ? 1 : 0
             };
@@ -129,11 +119,13 @@ namespace Usuario
             {
                 ["Categoria"] = _categoria,
                 ["Nombre"] = _nombre,
-                ["Variedad"] = string.IsNullOrEmpty(_variedad) ? (object)DBNull.Value : _variedad,
-                ["Descripcion"] = string.IsNullOrEmpty(_descripcion) ? (object)DBNull.Value : _descripcion,
                 ["Cantidad"] = _cantidad,
                 ["PrecioUnitario"] = _precioUnitario,
-                ["PorcentajeGerminacion"] = _categoria == "Semilla" ? (object)_porcentajeGerminacion : DBNull.Value,
+                ["PorcentajeGerminacion"] = (string.Equals(_categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+                             ? (_porcentajeGerminacion.HasValue ? (object)_porcentajeGerminacion.Value : (object)DBNull.Value)
+                             : (object)DBNull.Value,
+
                 ["IDProveedor"] = _idProveedor.HasValue ? (object)_idProveedor.Value : DBNull.Value,
                 ["Activo"] = _activo ? 1 : 0
             };
@@ -162,11 +154,9 @@ namespace Usuario
                 _idProducto = Convert.ToInt32(row["IDProducto"]);
                 _categoria = row["Categoria"].ToString();
                 _nombre = row["Nombre"].ToString();
-                _variedad = row["Variedad"] == DBNull.Value ? "" : row["Variedad"].ToString();
-                _descripcion = row["Descripcion"] == DBNull.Value ? "" : row["Descripcion"].ToString();
                 _cantidad = Convert.ToDecimal(row["Cantidad"]);
                 _precioUnitario = Convert.ToDecimal(row["PrecioUnitario"]);
-                _porcentajeGerminacion = row["PorcentajeGerminacion"] == DBNull.Value ? 0 : Convert.ToDecimal(row["PorcentajeGerminacion"]);
+                _porcentajeGerminacion = row["PorcentajeGerminacion"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(row["PorcentajeGerminacion"]);
                 _idProveedor = row["IDProveedor"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["IDProveedor"]);
                 _activo = Convert.ToBoolean(row["Activo"]);
                 return true;
@@ -183,7 +173,7 @@ namespace Usuario
             if (soloActivos)
                 condiciones.Add("Activo = 1");
             if (!string.IsNullOrEmpty(categoria))
-                condiciones.Add("Categoria = '" + categoria + "'");
+                condiciones.Add("Categoria = @categoria");
 
             if (condiciones.Count > 0)
                 consulta += " WHERE " + string.Join(" AND ", condiciones);
@@ -204,7 +194,7 @@ namespace Usuario
             if (soloActivos)
                 condiciones.Add("Activo = 1");
             if (!string.IsNullOrEmpty(categoria))
-                condiciones.Add("Categoria = '" + categoria + "'");
+                condiciones.Add("Categoria = @categoria");
 
             if (condiciones.Count > 0)
                 consulta += " WHERE " + string.Join(" AND ", condiciones);
@@ -234,7 +224,11 @@ namespace Usuario
         /// </summary>
         public bool EsValido()
         {
-            return !string.IsNullOrWhiteSpace(Nombre) && Cantidad >= 0 && PrecioUnitario >= 0;
+            bool baseValido = !string.IsNullOrWhiteSpace(Nombre) && Cantidad >= 0 && PrecioUnitario >= 0;
+            bool requiereGerm = string.Equals(Categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(Categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase);
+            if (requiereGerm && !PorcentajeGerminacion.HasValue) return false;
+            return baseValido;
         }
 
         /// <summary>

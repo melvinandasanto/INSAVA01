@@ -110,57 +110,86 @@ namespace Usuario
         {
             if (!ValidarCampos()) return;
 
-            producto.Categoria = CBCategoria.Text;
-            producto.Nombre = CBProducto.Text;
+            producto.Categoria = CBCategoria.Text?.Trim();
+            producto.Nombre = CBProducto.Text?.Trim();
             producto.Cantidad = NUPCantidad.Value;
 
-            // Validación flexible para Precio Unitario (acepta entero o decimal)
-            string textoPrecio = txtPrecioUnitario.Text.Trim();
-            if (!decimal.TryParse(textoPrecio, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
+            // Precio: usar InvariantCulture para consistencia con la BD
+            string textoPrecio = txtPrecioUnitario.Text.Trim().Replace(',', '.');
+            if (!decimal.TryParse(textoPrecio, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal precio))
             {
                 MessageBox.Show("El precio unitario debe ser un número válido (entero o decimal).");
                 return;
             }
-            producto.PrecioUnitario = precio;
+            producto.PrecioUnitario = Math.Round(precio, 2);
 
-            // Validación y conversión del porcentaje de germinación
-            if (CBCategoria.Text.Equals("Semilla", StringComparison.OrdinalIgnoreCase) ||
-                CBCategoria.Text.Equals("Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+            // Determinar si es semilla (comparación case-insensitive)
+            bool esSemilla = string.Equals(producto.Categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(producto.Categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase);
+
+            // Germinación: aceptar "85" -> 0.85 o "0.85"
+            if (esSemilla)
             {
-                string textoGerminacion = txtGerminacion.Text.Trim().Replace(',', '.');
-                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal germ))
+                string textoGerminacion = txtGerminacion.Text?.Trim();
+                if (string.IsNullOrWhiteSpace(textoGerminacion))
                 {
-                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85).");
+                    MessageBox.Show("Debe ingresar el porcentaje de germinación para productos de la categoría Semilla.");
                     return;
                 }
+                textoGerminacion = textoGerminacion.Replace(',', '.');
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal germ))
+                {
+                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85 o 85).");
+                    return;
+                }
+                // interpretar >1 como porcentaje en 0-100
+                if (germ > 1m) germ = germ / 100m;
+                germ = Math.Round(germ, 2);
                 if (germ < 0m || germ > 1m)
                 {
-                    MessageBox.Show("La germinación debe ser un número decimal entre 0 y 1 (por ejemplo, 0.85 para 85%).");
+                    MessageBox.Show("La germinación debe estar entre 0 y 1 (por ejemplo 0.85 para 85%).");
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
             }
             else
             {
-                producto.PorcentajeGerminacion = null; // Si tu clase permite null, usa null
+                producto.PorcentajeGerminacion = null;
             }
 
-            // Proveedor robusto
+            // Proveedor robusto: manejar DBNull, DataRowView, string o int
             object proveedorValue = CBProveedor.SelectedValue;
             int? idProveedor = null;
-            if (proveedorValue is int)
-                idProveedor = (int)proveedorValue;
-            else if (proveedorValue is string && int.TryParse((string)proveedorValue, out int idParsed))
-                idProveedor = idParsed;
-            else if (proveedorValue is DataRowView drv && drv.Row["IDProveedor"] is int idFromRow)
-                idProveedor = idFromRow;
+            if (proveedorValue == null || proveedorValue == DBNull.Value)
+            {
+                idProveedor = null;
+            }
+            else if (proveedorValue is int intVal)
+            {
+                idProveedor = intVal;
+            }
+            else if (proveedorValue is long longVal) // por si el binding devuelve long
+            {
+                idProveedor = (int)longVal;
+            }
+            else if (proveedorValue is string s && int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed))
+            {
+                idProveedor = parsed;
+            }
+            else if (proveedorValue is DataRowView drv && drv.Row.Table.Columns.Contains("IDProveedor"))
+            {
+                object rowVal = drv.Row["IDProveedor"];
+                if (rowVal != DBNull.Value && int.TryParse(rowVal.ToString(), out int rv)) idProveedor = rv;
+            }
             producto.IDProveedor = idProveedor;
 
             producto.Activo = checkactivo.Checked;
 
             try
             {
-                if (producto.Guardar())
+                // Si producto.Guardar() devuelve bool sin detalle, captura excepción para diagnóstico
+                bool ok = producto.Guardar();
+                if (ok)
                 {
                     MessageBox.Show("Producto guardado correctamente.");
                     CargarProductos();
@@ -174,59 +203,93 @@ namespace Usuario
             }
             catch (Exception ex)
             {
-                   MessageBox.Show("Error técnico: " + ex.Message);
-               }
+                string inner = ex.InnerException != null ? "\n" + ex.InnerException.Message : string.Empty;
+                MessageBox.Show("Error técnico al guardar el producto: " + ex.Message + inner);
+            }
         }
 
         private void btnEditar_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtId.Text)) return;
+            if (string.IsNullOrWhiteSpace(txtId.Text))
+            {
+                MessageBox.Show("ID de producto inválido.");
+                return;
+            }
 
-            producto.IDProducto = int.Parse(txtId.Text);
-            producto.Categoria = CBCategoria.Text;
-            producto.Nombre = CBProducto.Text;
+            if (!int.TryParse(txtId.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int idProd))
+            {
+                MessageBox.Show("ID de producto inválido.");
+                return;
+            }
+            producto.IDProducto = idProd;
+            producto.Categoria = CBCategoria.Text?.Trim();
+            producto.Nombre = CBProducto.Text?.Trim();
             producto.Cantidad = NUPCantidad.Value;
 
-            // Validación flexible para Precio Unitario (acepta entero o decimal)
-            string textoPrecio = txtPrecioUnitario.Text.Trim();
-            if (!decimal.TryParse(textoPrecio, NumberStyles.Any, CultureInfo.CurrentCulture, out decimal precio))
+            // Precio
+            string textoPrecio = txtPrecioUnitario.Text.Trim().Replace(',', '.');
+            if (!decimal.TryParse(textoPrecio, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal precio))
             {
                 MessageBox.Show("El precio unitario debe ser un número válido (entero o decimal).");
                 return;
             }
-            producto.PrecioUnitario = precio;
+            producto.PrecioUnitario = Math.Round(precio, 2);
 
-            // Validación y conversión del porcentaje de germinación
-            if (CBCategoria.Text == "Semilla" || CBCategoria.Text == "Semilla maquilada")
+            bool esSemilla = string.Equals(producto.Categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                          || string.Equals(producto.Categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase);
+
+            if (esSemilla)
             {
-                string textoGerminacion = txtGerminacion.Text.Trim().Replace(',', '.');
-                if (!decimal.TryParse(textoGerminacion, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal germ))
+                string textoGerminacion = txtGerminacion.Text?.Trim();
+                if (string.IsNullOrWhiteSpace(textoGerminacion))
                 {
-                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85).");
+                    MessageBox.Show("Debe ingresar el porcentaje de germinación para productos de la categoría Semilla.");
                     return;
                 }
+                textoGerminacion = textoGerminacion.Replace(',', '.');
+                if (!decimal.TryParse(textoGerminacion, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal germ))
+                {
+                    MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85 o 85).");
+                    return;
+                }
+                if (germ > 1m) germ = germ / 100m;
+                germ = Math.Round(germ, 2);
                 if (germ < 0m || germ > 1m)
                 {
-                    MessageBox.Show("La germinación debe ser un número decimal entre 0 y 1 (por ejemplo, 0.85 para 85%).");
+                    MessageBox.Show("La germinación debe estar entre 0 y 1 (por ejemplo 0.85 para 85%).");
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
-
             }
-            else // Producto
+            else
             {
-                producto.PorcentajeGerminacion = null; // O NULL si tu clase lo permite
+                producto.PorcentajeGerminacion = null;
             }
 
-            // Proveedor robusto
+            // Proveedor
             object proveedorValue = CBProveedor.SelectedValue;
             int? idProveedor = null;
-            if (proveedorValue is int)
-                idProveedor = (int)proveedorValue;
-            else if (proveedorValue is string && int.TryParse((string)proveedorValue, out int idParsed))
-                idProveedor = idParsed;
-            else if (proveedorValue is DataRowView drv && drv.Row["IDProveedor"] is int idFromRow)
-                idProveedor = idFromRow;
+            if (proveedorValue == null || proveedorValue == DBNull.Value)
+            {
+                idProveedor = null;
+            }
+            else if (proveedorValue is int intVal)
+            {
+                idProveedor = intVal;
+            }
+            else if (proveedorValue is long longVal)
+            {
+                idProveedor = (int)longVal;
+            }
+            else if (proveedorValue is string s && int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed))
+            {
+                idProveedor = parsed;
+            }
+            else if (proveedorValue is DataRowView drv && drv.Row.Table.Columns.Contains("IDProveedor"))
+            {
+                object rowVal = drv.Row["IDProveedor"];
+                if (rowVal != DBNull.Value && int.TryParse(rowVal.ToString(), out int rv)) idProveedor = rv;
+            }
             producto.IDProveedor = idProveedor;
 
             producto.Activo = checkactivo.Checked;
@@ -249,9 +312,11 @@ namespace Usuario
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error técnico al editar el producto: " + ex.Message + (ex.InnerException != null ? "\n" + ex.InnerException.Message : ""));
+                string inner = ex.InnerException != null ? "\n" + ex.InnerException.Message : string.Empty;
+                MessageBox.Show("Error técnico al editar el producto: " + ex.Message + inner);
             }
         }
+
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
