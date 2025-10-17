@@ -214,20 +214,20 @@ namespace Usuario
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            // Ejecutar validación antes de guardar
+            if (!ValidarCampos())
+                return;
+
+            // Asignar valores a cliente
             cliente.NumeroIdentidad = CBNumeroIdentidad.Text.Trim();
+            cliente.PrimerNombre = txtPrimerNombre.Text.Trim();
+            cliente.SegundoNombre = txtSegundoNombre.Text.Trim();
+            cliente.PrimerApellido = txtPrimerApellido.Text.Trim();
+            cliente.SegundoApellido = txtSegundoApellido.Text.Trim();
+            cliente.NumTel = txtTelefono.Text.Trim();
+            cliente.Activo = checkactivo.Checked;
 
-            if (string.IsNullOrWhiteSpace(cliente.NumeroIdentidad))
-            {
-                MessageBox.Show("Debe ingresar el número de identidad.");
-                return;
-            }
-
-            if (cliente.NumeroIdentidad.Length != 13)
-            {
-                MessageBox.Show("El número de identidad debe tener exactamente 13 dígitos.");
-                return;
-            }
-
+            // Validar duplicado si es nuevo
             if (string.IsNullOrWhiteSpace(txtId.Text))
             {
                 if (cliente.ExistePorNumeroIdentidad(cliente.NumeroIdentidad))
@@ -237,13 +237,7 @@ namespace Usuario
                 }
             }
 
-            cliente.PrimerNombre = txtPrimerNombre.Text.Trim();
-            cliente.SegundoNombre = txtSegundoNombre.Text.Trim();
-            cliente.PrimerApellido = txtPrimerApellido.Text.Trim();
-            cliente.SegundoApellido = txtSegundoApellido.Text.Trim();
-            cliente.NumTel = txtTelefono.Text.Trim();
-            cliente.Activo = checkactivo.Checked;
-
+            // Guardar o editar
             bool resultado = string.IsNullOrWhiteSpace(txtId.Text)
                 ? cliente.Guardar()
                 : cliente.Editar();
@@ -261,6 +255,8 @@ namespace Usuario
                 MessageBox.Show("Error al guardar el cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
@@ -424,5 +420,58 @@ namespace Usuario
             if (dataGridViewClientes.Columns.Contains("NombreCompleto"))
                 dataGridViewClientes.Columns["NombreCompleto"].HeaderText = "Nombre Completo";
         }
+    
+    private bool ValidarCampos()
+        {
+            // Número de identidad
+            if (string.IsNullOrWhiteSpace(CBNumeroIdentidad.Text))
+            {
+                MessageBox.Show("Debe ingresar el número de identidad.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CBNumeroIdentidad.Focus();
+                return false;
+            }
+            if (CBNumeroIdentidad.Text.Length != 13)
+            {
+                MessageBox.Show("El número de identidad debe tener exactamente 13 dígitos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CBNumeroIdentidad.Focus();
+                return false;
+            }
+
+            // Primer nombre
+            if (string.IsNullOrWhiteSpace(txtPrimerNombre.Text))
+            {
+                MessageBox.Show("Debe ingresar el primer nombre.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPrimerNombre.Focus();
+                return false;
+            }
+
+            // Primer apellido
+            if (string.IsNullOrWhiteSpace(txtPrimerApellido.Text))
+            {
+                MessageBox.Show("Debe ingresar el primer apellido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPrimerApellido.Focus();
+                return false;
+            }
+
+            // Segundo apellido (si quieres obligatorio)
+            if (string.IsNullOrWhiteSpace(txtSegundoApellido.Text))
+            {
+                MessageBox.Show("Debe ingresar el segundo apellido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtSegundoApellido.Focus();
+                return false;
+            }
+
+            // Teléfono
+            if (string.IsNullOrWhiteSpace(txtTelefono.Text))
+            {
+                MessageBox.Show("Debe ingresar el número de teléfono.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                return false;
+            }
+
+            // Si todo está bien
+            return true;
+        }
+
     }
 }
