@@ -22,6 +22,7 @@ namespace Usuario
         {
             InitializeComponent();
             conexion = new ClaseConexion();
+            DiseñoGlobal.RegistrarFormulario(this);
             _cliente = cliente;
             _detalleFactura = detalle;
             _numeroOrden = numeroOrden;

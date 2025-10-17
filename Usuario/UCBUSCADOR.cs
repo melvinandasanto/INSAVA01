@@ -15,6 +15,7 @@ namespace Usuario
         {
             InitializeComponent();
             _conexionDB = new ClaseConexion();
+            DiseñoGlobal.RegistrarUserControl(this);
         }
 
         private void UCBUSCADOR_Load(object sender, EventArgs e)

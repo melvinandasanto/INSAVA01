@@ -5,11 +5,15 @@ using System.Windows.Forms;
 
 namespace Usuario.Clases
 {
-    /// <summary>
-    /// Proporciona utilidades globales para aplicar estilos, temas y formatos a controles de la aplicación.
-    /// </summary>
     public static class DiseñoGlobal
     {
+        // Evento para notificar cambios de tema
+        public static event EventHandler<Tema> TemaCambiado;
+
+        // Lista de formularios activos
+        private static readonly HashSet<WeakReference<Form>> FormsActivos = new HashSet<WeakReference<Form>>();
+        private static readonly HashSet<WeakReference<UserControl>> ControlsActivos = new HashSet<WeakReference<UserControl>>();
+
         // --- TEMAS ---
         public static void AplicarTema(Form form, Tema tema)
         {
@@ -288,6 +292,33 @@ namespace Usuario.Clases
         public static void GuardarTemaUsuario(Tema tema)
         {
             _temaUsuario = tema;
+            
+            // Notifica el cambio de tema
+            TemaCambiado?.Invoke(null, tema);
+
+            // Actualiza todos los formularios activos
+            foreach (var weakRef in FormsActivos)
+            {
+                if (weakRef.TryGetTarget(out Form form))
+                {
+                    if (!form.IsDisposed && form.Visible)
+                    {
+                        form.BeginInvoke(new Action(() => AplicarTema(form, tema)));
+                    }
+                }
+            }
+
+            // Actualiza todos los controles de usuario activos
+            foreach (var weakRef in ControlsActivos)
+            {
+                if (weakRef.TryGetTarget(out UserControl control))
+                {
+                    if (!control.IsDisposed && control.Visible)
+                    {
+                        control.BeginInvoke(new Action(() => AplicarTema(control, tema)));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -305,6 +336,56 @@ namespace Usuario.Clases
         {
             var tema = ObtenerTemaUsuario();
             AplicarTema(form, tema);
+        }
+
+        public static void RegistrarFormulario(Form form)
+        {
+            if (form == null) return;
+
+            // Limpia referencias muertas
+            LimpiarReferencias();
+
+            // Agrega el nuevo formulario
+            FormsActivos.Add(new WeakReference<Form>(form));
+
+            // Aplica el tema actual
+            AplicarTema(form, ObtenerTemaUsuario());
+
+            // Suscribe al evento Load para manejar controles dinámicos
+            form.Load += (s, e) => AplicarTema(form, ObtenerTemaUsuario());
+
+            // Suscribe al evento ControlAdded para manejar controles agregados dinámicamente
+            form.ControlAdded += (s, e) => 
+            {
+                if (e.Control is UserControl uc)
+                {
+                    RegistrarUserControl(uc);
+                }
+                AplicarTema(e.Control, ObtenerTemaUsuario());
+            };
+        }
+
+        public static void RegistrarUserControl(UserControl control)
+        {
+            if (control == null) return;
+
+            // Limpia referencias muertas
+            LimpiarReferencias();
+
+            // Agrega el nuevo control
+            ControlsActivos.Add(new WeakReference<UserControl>(control));
+
+            // Aplica el tema actual
+            AplicarTema(control, ObtenerTemaUsuario());
+
+            // Suscribe al evento ControlAdded para manejar controles agregados dinámicamente
+            control.ControlAdded += (s, e) => AplicarTema(e.Control, ObtenerTemaUsuario());
+        }
+
+        private static void LimpiarReferencias()
+        {
+            FormsActivos.RemoveWhere(wr => !wr.TryGetTarget(out _));
+            ControlsActivos.RemoveWhere(wr => !wr.TryGetTarget(out _));
         }
     }
 }

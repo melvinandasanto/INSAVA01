@@ -33,7 +33,9 @@ namespace Usuario
             txtTelefono.TextChanged += ControlModificado;
             checkactivo.CheckedChanged += ControlModificado;
             EstadoInicial();
+        DiseñoGlobal.RegistrarUserControl(this);
         }
+
         private void FCLIENTE_Load(object sender, EventArgs e)
         {
             Permisos.AplicarPermisos(this);

@@ -29,6 +29,7 @@ namespace Usuario
             rol = new ClaseROL();
             conexion = new ClaseConexion();
             this.Load += UCSUARIO_Load;
+            DiseñoGlobal.RegistrarUserControl(this);
         }
 
         private void UCSUARIO_Load(object sender, EventArgs e)

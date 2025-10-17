@@ -23,8 +23,10 @@ namespace Usuario
         {
             InitializeComponent();
             conexion = new ClaseConexion();
-            // Inicializa el DataGridView de maquila
-            dgvMaquila = new DataGridView();
+            DiseñoGlobal.RegistrarUserControl(this);
+        
+         // Inicializa el DataGridView de maquila
+           dgvMaquila = new DataGridView();
             dgvMaquila.Name = "dgvMaquila";
             dgvMaquila.Visible = false;
             dgvMaquila.Anchor = dgvPedido.Anchor;

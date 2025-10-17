@@ -20,7 +20,7 @@ namespace Usuario
             this.Load += UCProducto_Load;
             // Asegura que el evento esté asignado
             this.NUPCantidad.ValueChanged += new System.EventHandler(this.ControlModificado);
-
+            DiseñoGlobal.RegistrarUserControl(this);
         }
 
         private void UCProducto_Load(object sender, EventArgs e)

@@ -20,6 +20,8 @@ namespace Usuario
             this.Load += PROVEEDOR_Load;
 
             btnClean.Click += btnClean_Click;
+            DiseñoGlobal.RegistrarFormulario(this);
+        
         }
 
         private void PROVEEDOR_Load(object sender, EventArgs e)

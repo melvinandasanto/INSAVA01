@@ -52,6 +52,12 @@ namespace Usuario
             AgregarBotonPerfilUsuario();
         }
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            DiseñoGlobal.RegistrarFormulario(this);
+        }
+
         private void tsbtnCambiarTema_Click(object sender, EventArgs e)
         {
             temaActual = (temaActual == Temas.Light) ? Temas.Dark : Temas.Light;
