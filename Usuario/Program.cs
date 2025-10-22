@@ -18,6 +18,25 @@ namespace Usuario
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // Crear conexión temporal solo para pruebas
+            var conexion = new ClaseConexion("MARCELAPACHECO\\MSSQLSERVER05", "SISTEMASEMILLA");
+
+            if (!conexion.VerificarServidor())
+            {
+                MessageBox.Show("No se pudo conectar al servidor", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (!conexion.VerificarBaseDatos())
+            {
+                var respuesta = MessageBox.Show("La base de datos no existe. ¿Deseas crearla?", "No existe", MessageBoxButtons.YesNo);
+                if (respuesta == DialogResult.Yes)
+                {
+                    try { conexion.CrearBaseDatosSiNoExiste(rutaScript); }
+                    catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); return; }
+                }
+                else return;
+            }
             Application.Run(new FormInicio());
         }
     }

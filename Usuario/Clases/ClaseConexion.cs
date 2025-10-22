@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Usuario.Clases;
 
@@ -19,7 +20,7 @@ namespace Usuario
         /// <summary>
         /// Inicializa una nueva instancia de ClaseConexion.
         /// </summary>
-        public ClaseConexion(string host = "DESKTOP-CE353KH", string nombreDB = "SISTEMASEMILLA")
+        public ClaseConexion(string host = "MARCELAPACHECO\\MSSQLSERVER05", string nombreDB = "SISTEMASEMILLA")
         {
             _host = host;
             _nombreDB = nombreDB;
@@ -230,6 +231,85 @@ namespace Usuario
             if (_conexion.State != ConnectionState.Open)
                 Conectar();
             return _conexion.BeginTransaction();
+        }
+
+        public bool VerificarServidor()
+        {
+            try
+            {
+                using (SqlConnection cn = new SqlConnection($"Server={_host};Integrated Security=True;Encrypt=False;"))
+                {
+                    cn.Open();
+                    return true;
+                }
+            }
+            catch
+            {
+                MessageBox.Show(" No se pudo conectar al servidor SQL. El programa se cerrará.",
+                                "Error de conexión", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit();
+                return false;
+            }
+        }
+
+        public bool VerificarBaseDatos()
+        {
+            try
+            {
+                var builder = new SqlConnectionStringBuilder
+                {
+                    DataSource = _host,
+                    IntegratedSecurity = true,
+                    Encrypt = false,
+                    ConnectTimeout = 5,
+                    InitialCatalog = "master"
+                };
+
+                using (var cn = new SqlConnection(builder.ConnectionString))
+                using (var cmd = cn.CreateCommand())
+                {
+                    cn.Open();
+                    cmd.CommandText = "SELECT database_id FROM sys.databases WHERE name = @name";
+                    cmd.Parameters.AddWithValue("@name", _nombreDB);
+                    object result = cmd.ExecuteScalar();
+                    return result != null;
+                }
+            }
+            catch
+            {
+                throw; // Dejar que la capa de UI decida qué mostrar o hacer
+            }
+        }
+
+        // Crear base desde script manejando GO
+        public void CrearBaseDatosSiNoExiste(string rutaScript)
+        {
+            string script = File.ReadAllText(rutaScript);
+            // Separar por líneas que contengan solo GO (ignorar mayúsculas/minúsculas)
+            var batches = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            var builder = new SqlConnectionStringBuilder
+            {
+                DataSource = _host,
+                IntegratedSecurity = true,
+                Encrypt = false,
+                ConnectTimeout = 30,
+                InitialCatalog = "master"
+            };
+
+            using (var cn = new SqlConnection(builder.ConnectionString))
+            {
+                cn.Open();
+                foreach (var batch in batches)
+                {
+                    if (string.IsNullOrWhiteSpace(batch)) continue;
+                    using (var cmd = cn.CreateCommand())
+                    {
+                        cmd.CommandText = batch;
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
         }
     }
 }
