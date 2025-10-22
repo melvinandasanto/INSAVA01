@@ -20,8 +20,8 @@ namespace Usuario
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Definir la ruta del script SQL
-            string rutaScript = Path.Combine(Application.StartupPath, "Scripts", "CreateDatabase.sql");
+            // Ruta al script de la base de datos
+            string rutaScript = @"C:\Users\melvi\source\repos\INSAVA\BasedeDatos";
 
             // Crear conexión temporal solo para pruebas
             var conexion = new ClaseConexion("MARCELAPACHECO\\MSSQLSERVER05", "SISTEMASEMILLA");
@@ -34,9 +34,18 @@ namespace Usuario
 
             if (!conexion.VerificarBaseDatos())
             {
-                if (!File.Exists(rutaScript))
+                // Verificar que el script existe
+                if (!Directory.Exists(rutaScript))
                 {
-                    MessageBox.Show("No se encontró el script de creación de la base de datos", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("No se encontró el directorio con los scripts", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string rutaCompleta = Path.Combine(rutaScript, "SISTEMASEMILLA.sql");
+                
+                if (!File.Exists(rutaCompleta))
+                {
+                    MessageBox.Show("No se encontró el archivo de script SQL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -45,7 +54,7 @@ namespace Usuario
                 {
                     try 
                     { 
-                        conexion.CrearBaseDatosSiNoExiste(rutaScript);
+                        conexion.CrearBaseDatosSiNoExiste(rutaCompleta);
                         MessageBox.Show("Base de datos creada exitosamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex) 
