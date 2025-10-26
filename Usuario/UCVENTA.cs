@@ -16,7 +16,6 @@ namespace Usuario
     {
         private ClaseConexion conexion;
         private DataTable productosOriginal;
-        private DataGridView dgvMaquila;
         private List<TextBox> CamposDecimales;
 
         public UCVENTA()
@@ -25,16 +24,11 @@ namespace Usuario
             conexion = new ClaseConexion();
             DiseñoGlobal.RegistrarUserControl(this);
 
-            // Inicializa el DataGridView de maquila
-            dgvMaquila = new DataGridView();
-            dgvMaquila.Name = "dgvMaquila";
-            dgvMaquila.Visible = false;
-            dgvMaquila.Anchor = dgvPedido.Anchor;
-            dgvMaquila.Size = dgvPedido.Size;
-            dgvMaquila.Location = dgvPedido.Location;
-            panel3.Controls.Add(dgvMaquila);
+            // Ocultar radio buttons inicialmente
+            rbStock.Visible = false;
+            radioButton1.Visible = false;
 
-            // Selecciona por defecto "Producto/Semilla" si existe en los ítems
+            // Selecciona por defecto "Producto/Semilla" si existe
             if (CBOperacion.Items.Contains("Producto/Semilla"))
                 CBOperacion.SelectedItem = "Producto/Semilla";
             else if (CBOperacion.Items.Count > 0)
@@ -46,12 +40,8 @@ namespace Usuario
             Permisos.AplicarPermisos(this);
             DiseñoGlobal.AplicarTamaño(this);
             ConfigurarDataGridView();
-            ConfigurarDataGridViewMaquila();
             DiseñoGlobal.AplicarEstiloDataGridView(dgvPedido, Temas.Light); // SIEMPRE inicia en Light
-            DiseñoGlobal.AplicarEstiloDataGridView(dgvMaquila, Temas.Light);
             CBOperacion.SelectedIndexChanged += CBOperacion_SelectedIndexChanged;
-            dgvMaquila.CellClick += DgvMaquila_CellClick;
-            dgvMaquila.CellEndEdit += dgvMaquila_CellEndEdit;
             CamposDecimales = new List<TextBox>
                 {
                     txtPrecio,
@@ -91,7 +81,6 @@ namespace Usuario
             if (menu != null)
             {
                 DiseñoGlobal.AplicarEstiloDataGridView(dgvPedido, menu.temaActual);
-                DiseñoGlobal.AplicarEstiloDataGridView(dgvMaquila, menu.temaActual);
             }
         }
 
@@ -122,32 +111,6 @@ namespace Usuario
             dgvPedido.Columns["Cantidad"].ReadOnly = false;
         }
 
-        private void ConfigurarDataGridViewMaquila()
-        {
-            dgvMaquila.Columns.Clear();
-            dgvMaquila.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvMaquila.Columns.Add("IDProducto", "IDProducto");
-            dgvMaquila.Columns["IDProducto"].Visible = false;
-            dgvMaquila.Columns.Add("Producto", "Producto");
-            dgvMaquila.Columns.Add("PorcentajeGerminacion", "Germinación");
-            dgvMaquila.Columns.Add("Cantidad", "Cantidad");
-            dgvMaquila.Columns.Add("SemillasRealistas", "Plantulas");
-            // Ahora guardamos precio de maquila en esta columna
-            dgvMaquila.Columns.Add("PrecioMaquila", "Precio Maquila");
-            dgvMaquila.Columns.Add("Total", "Total");
-            DataGridViewButtonColumn btnEliminar = new DataGridViewButtonColumn
-            {
-                HeaderText = "Eliminar",
-                Name = "Eliminar",
-                Text = "X",
-                UseColumnTextForButtonValue = true
-            };
-            dgvMaquila.Columns.Add(btnEliminar);
-            dgvMaquila.AllowUserToAddRows = false;
-            dgvMaquila.ReadOnly = false;
-            dgvMaquila.Columns["Cantidad"].ReadOnly = false;
-        }
-
         private void CargarProductosCombo()
         {
             string sql;
@@ -173,30 +136,32 @@ namespace Usuario
         {
             if (CBOperacion.SelectedItem == null)
                 return;
+
             string operacion = CBOperacion.SelectedItem.ToString();
             if (operacion == "Producto/Semilla")
             {
-                dgvPedido.Visible = true;
-                dgvMaquila.Visible = false;
-                OcultarControlesMaquila(); // <-- Agrega esta línea
+                // Ocultar controles de maquila
+                rbStock.Visible = false;
+                radioButton1.Visible = false;
+                OcultarControlesMaquila();
                 CargarProductosCombo();
-                rbStock.Checked = false;
-                radioButton1.Checked = false;
+                
+                // Restablecer campos
                 txtStockoporcent.ReadOnly = true;
                 txtStockoporcent.Enabled = true;
                 txtPrecio.ReadOnly = true;
+                txtPrecio.Visible = true;
+                lblPrecio.Visible = true;
             }
             else if (operacion == "Maquila")
             {
-                dgvPedido.Visible = false;
-                dgvMaquila.Visible = true;
+                // Mostrar controles de maquila
                 rbStock.Visible = true;
                 radioButton1.Visible = true;
-                CargarSemillasCombo();
-                rbStock.Checked = true; // Selecciona por defecto "Stock"
-                                        // Forzar evento CheckedChanged para aplicar lógica
-                RbStock_CheckedChanged(rbStock, EventArgs.Empty);
+                rbStock.Checked = true; // Seleccionar Stock por defecto
+                
                 MostrarControlesMaquila();
+                CargarSemillasCombo();
             }
         }
 
@@ -245,14 +210,12 @@ namespace Usuario
         private void BtnBuscar_Click(object sender, EventArgs e)
         {
             string nombre = cmbProducto.Text.Trim();
-
-            bool esMaquila = CBOperacion.SelectedItem != null && CBOperacion.SelectedItem.ToString() == "Maquila";
+            bool esMaquila = CBOperacion.SelectedItem?.ToString() == "Maquila";
             bool esMaquilaCliente = esMaquila && radioButton1.Checked;
-            bool esMaquilaStock = esMaquila && rbStock.Checked;
 
-            // Si hay selección válida, busca normalmente
-            if (cmbProducto.Items.Count > 0 && cmbProducto.SelectedIndex >= 0 && cmbProducto.SelectedValue != null)
+            if (cmbProducto.SelectedValue != null)
             {
+                // Producto existente en BD
                 int idProducto = Convert.ToInt32(cmbProducto.SelectedValue);
                 string sql = "SELECT Cantidad AS Stock, PrecioUnitario, PorcentajeGerminacion, PrecioMaquila FROM PRODUCTO WHERE IDProducto=@id";
                 SqlParameter[] parametros = { new SqlParameter("@id", idProducto) };
@@ -260,317 +223,326 @@ namespace Usuario
 
                 if (dt.Rows.Count > 0)
                 {
-                    // llenar txtMaquila con valor por defecto si existe
-                    string precioMaquilaText = dt.Rows[0].Table.Columns.Contains("PrecioMaquila") && dt.Rows[0]["PrecioMaquila"] != DBNull.Value
-                                               ? dt.Rows[0]["PrecioMaquila"].ToString()
-                                               : "";
-
+                    // Producto encontrado - bloquear campos
+                    txtPrecio.ReadOnly = true;
+                    txtMaquila.ReadOnly = true;
+                    
                     if (esMaquilaCliente)
                     {
-                        lblestock.Text = "%";
                         txtStockoporcent.ReadOnly = false;
-                        txtStockoporcent.Enabled = true;
-                        txtPrecio.Visible = false;
-                        lblPrecio.Visible = false;
-                        txtStockoporcent.Text = dt.Rows[0]["PorcentajeGerminacion"].ToString();
-                        txtMaquila.Text = precioMaquilaText;
-                        nudCantidad.Maximum = 1000000; // Sin límite real para maquila cliente
-                        nudCantidad.Value = 0;
-                        return;
-                    }
-                    if (esMaquilaStock)
-                    {
-                        lblestock.Text = "Stock";
-                        txtStockoporcent.ReadOnly = true;
-                        txtStockoporcent.Enabled = true;
-                        txtStockoporcent.Text = dt.Rows[0]["Stock"].ToString();
-                        txtPrecio.Visible = true;
+                        txtPrecio.Visible = true; // Mostrar pero no usar
                         lblPrecio.Visible = true;
-                        txtPrecio.Text = dt.Rows[0]["PrecioUnitario"].ToString();
-                        txtMaquila.Enabled = true;
-                        txtMaquila.Text = precioMaquilaText;
-
-                        // Asignar el máximo del NumericUpDown según el stock
-                        decimal stockDisponible = 0;
-                        decimal.TryParse(dt.Rows[0]["Stock"].ToString().Replace('.', ','), out stockDisponible);
-                        nudCantidad.Maximum = stockDisponible > 0 ? stockDisponible : 1;
-                        nudCantidad.Value = 0;
-                        return;
                     }
-                    // Producto/Semilla
-                    lblestock.Text = "Stock";
-                    txtStockoporcent.Text = dt.Rows[0]["Stock"].ToString();
-                    txtStockoporcent.ReadOnly = true;
-                    txtStockoporcent.Enabled = false;
-                    txtPrecio.Visible = true;
-                    lblPrecio.Visible = true;
-                    txtPrecio.Text = dt.Rows[0]["PrecioUnitario"].ToString();
-                    txtMaquila.Enabled = esMaquila;
-                    txtMaquila.Text = precioMaquilaText;
+                    else
+                    {
+                        txtStockoporcent.ReadOnly = true;
+                    }
 
-                    // Asignar el máximo del NumericUpDown según el stock
-                    decimal stockDisponible2 = 0;
-                    decimal.TryParse(dt.Rows[0]["Stock"].ToString().Replace('.', ','), out stockDisponible2);
-                    nudCantidad.Maximum = stockDisponible2 > 0 ? stockDisponible2 : 1;
-                    nudCantidad.Value = 0;
-                    return;
+                    // Llenar datos...
+                    CargarDatosProducto(dt.Rows[0]);
                 }
             }
-
-            // Lógica para crear producto nuevo solo aplica en maquila/cliente
-            if (esMaquilaCliente && !string.IsNullOrWhiteSpace(nombre))
+            else if (esMaquilaCliente)
             {
-                lblestock.Text = "%";
-                txtStockoporcent.ReadOnly = false;
-                txtStockoporcent.Enabled = true;
-                txtStockoporcent.Text = "";
-
-                lblPrecio.Visible = false;
+                // Nuevo producto del cliente
                 txtPrecio.Visible = false;
-
-                txtMaquila.Enabled = true;
+                lblPrecio.Visible = false;
+                txtStockoporcent.ReadOnly = false;
                 txtMaquila.ReadOnly = false;
-                txtMaquila.Text = "";
+                txtStockoporcent.Text = "";
+                lblestock.Text = "%";
+                nudCantidad.Maximum = 1000000;
+            }
+        }
 
-                nudCantidad.Maximum = 1000000; // Sin límite real para maquila cliente
-                nudCantidad.Value = 0;
+        // 6. Método auxiliar para cargar datos del producto
+        private void CargarDatosProducto(DataRow row)
+        {
+            string precioMaquilaText = row.Table.Columns.Contains("PrecioMaquila") && 
+                                      row["PrecioMaquila"] != DBNull.Value
+                                      ? row["PrecioMaquila"].ToString()
+                                      : "";
+
+            txtStockoporcent.Text = row["Stock"].ToString();
+            txtPrecio.Text = row["PrecioUnitario"].ToString();
+            txtMaquila.Text = precioMaquilaText;
+            
+            decimal stock = 0;
+            decimal.TryParse(row["Stock"].ToString(), out stock);
+            nudCantidad.Maximum = stock > 0 ? stock : 1;
+            nudCantidad.Value = 0;
+        }
+
+        private void BtnAgregar_Click(object sender, EventArgs e)
+        {
+            string nombreProducto = cmbProducto.Text.Trim();
+            int cantidad = (int)nudCantidad.Value;
+            bool esMaquila = CBOperacion.SelectedItem?.ToString() == "Maquila";
+
+            if (string.IsNullOrWhiteSpace(nombreProducto) || cantidad <= 0)
+            {
+                MessageBox.Show("Ingrese un producto válido y una cantidad mayor a 0.");
                 return;
             }
 
-            MessageBox.Show("Producto no encontrado o seleccione un producto válido.");
+            DataRowView row = cmbProducto.SelectedItem as DataRowView;
+            if (row != null)
+            {
+                int idProducto = Convert.ToInt32(row["IDProducto"]);
+                string categoria = row["Categoria"].ToString();
+
+                decimal precio = 0m;
+                if (esMaquila)
+                {
+                    decimal.TryParse(txtMaquila.Text.Replace('.', ','), out precio);
+                }
+                else
+                {
+                    decimal.TryParse(row["PrecioUnitario"].ToString().Replace('.', ','), out precio);
+                }
+
+                decimal subtotal = cantidad * precio;
+                string nombreMostrar = esMaquila ? $"Maquila {nombreProducto}" : nombreProducto;
+
+                // Añadir fila creando la fila y asignando celdas por nombre (más robusto)
+                int newIndex = dgvPedido.Rows.Add();
+                var nuevaFila = dgvPedido.Rows[newIndex];
+                nuevaFila.Cells["IDProducto"].Value = idProducto;
+                nuevaFila.Cells["Producto"].Value = nombreMostrar;
+                nuevaFila.Cells["Categoria"].Value = categoria;
+                nuevaFila.Cells["Cantidad"].Value = cantidad;
+                nuevaFila.Cells["PrecioUnitario"].Value = precio;
+                nuevaFila.Cells["Subtotal"].Value = subtotal;
+            }
+            else if (esMaquila) // Nuevo producto de maquila traído por cliente
+            {
+                if (!decimal.TryParse(txtMaquila.Text.Replace('.', ','), out decimal precioMaquila))
+                {
+                    MessageBox.Show("Ingrese un precio de maquila válido.");
+                    return;
+                }
+
+                decimal subtotal = cantidad * precioMaquila;
+                int newIndex = dgvPedido.Rows.Add();
+                var nuevaFila = dgvPedido.Rows[newIndex];
+                nuevaFila.Cells["IDProducto"].Value = DBNull.Value;
+                nuevaFila.Cells["Producto"].Value = $"Maquila {nombreProducto}";
+                nuevaFila.Cells["Categoria"].Value = "Semilla maquilada";
+                nuevaFila.Cells["Cantidad"].Value = cantidad;
+                nuevaFila.Cells["PrecioUnitario"].Value = precioMaquila;
+                nuevaFila.Cells["Subtotal"].Value = subtotal;
+            }
+
+            ActualizarTotales();
+            LimpiarCampos();
         }
 
-        private void btnLimpiar_Click(object sender, EventArgs e)
+        private void MostrarControlesMaquila()
+        {
+            lblMaquila.Visible = true;
+            txtMaquila.Visible = true;
+            
+            // Si hay producto seleccionado, verificar si existe en BD
+            if (cmbProducto.SelectedItem is DataRowView row)
+            {
+                txtMaquila.ReadOnly = true; // Producto existente
+                if (row.Row.Table.Columns.Contains("PrecioMaquila") && 
+                    row["PrecioMaquila"] != DBNull.Value)
+                {
+                    txtMaquila.Text = row["PrecioMaquila"].ToString();
+                }
+            }
+            else
+            {
+                txtMaquila.ReadOnly = false; // Nuevo producto
+                txtMaquila.Text = "";
+            }
+        }
+
+        private void OcultarControlesMaquila()
+        {
+            lblMaquila.Visible = false;
+            txtMaquila.Visible = false;
+        }
+
+        // Devuelve true si la operación seleccionada es "Maquila"
+        private bool OperacionEsMaquila()
+        {
+            return CBOperacion.SelectedItem != null && CBOperacion.SelectedItem.ToString() == "Maquila";
+        }
+
+        // Devuelve un DataTable con el detalle de los pedidos (ya no depende de una columna 'Tipo' en el grid)
+        public DataTable ObtenerDetallePedidos()
+        {
+            DataTable detalle = new DataTable();
+            detalle.Columns.Add("IDProducto", typeof(int));
+            detalle.Columns.Add("Producto", typeof(string));
+            detalle.Columns.Add("Cantidad", typeof(decimal));
+            detalle.Columns.Add("PrecioUnitario", typeof(decimal));
+            detalle.Columns.Add("Subtotal", typeof(decimal));
+            detalle.Columns.Add("TipoOperacion", typeof(string));
+
+            foreach (DataGridViewRow row in dgvPedido.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                int idProducto = row.Cells["IDProducto"].Value != null && row.Cells["IDProducto"].Value != DBNull.Value
+                    ? Convert.ToInt32(row.Cells["IDProducto"].Value)
+                    : 0;
+
+                string producto = row.Cells["Producto"].Value?.ToString() ?? "";
+
+                decimal precioUnitario = 0m;
+                decimal.TryParse(row.Cells["PrecioUnitario"].Value?.ToString().Replace('.', ','), out precioUnitario);
+
+                decimal subtotal = 0m;
+                decimal.TryParse(row.Cells["Subtotal"].Value?.ToString().Replace('.', ','), out subtotal);
+
+                decimal cantidad = 0m;
+                decimal.TryParse(row.Cells["Cantidad"].Value?.ToString().Replace('.', ','), out cantidad);
+
+                // Inferir tipo desde el texto del producto
+                string tipoOperacion = (producto.StartsWith("Maquila ", StringComparison.OrdinalIgnoreCase) ||
+                                        producto.Contains("(Maquila)")) ? "Maquila" : "Venta";
+
+                detalle.Rows.Add(idProducto, producto, cantidad, precioUnitario, subtotal, tipoOperacion);
+            }
+
+            return detalle;
+        }
+
+        // Limpia los pedidos y actualiza los totales
+        public void LimpiarPedidos()
+        {
+            dgvPedido.Rows.Clear();
+            ActualizarTotales();
+        }
+
+        // =====================
+        // Totales
+        // =====================
+        // Hago público para que otros formularios puedan invocarlo si es necesario.
+        public void ActualizarTotales()
+        {
+            ActualizarTotalesGenerales();
+        }
+
+        private void ActualizarTotalesGenerales()
+        {
+            decimal totalVenta = 0m;
+            foreach (DataGridViewRow row in dgvPedido.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                decimal subtotal = 0m;
+                var val = row.Cells["Subtotal"].Value;
+                if (val != null && val != DBNull.Value)
+                    decimal.TryParse(val.ToString().Replace('.', ','), out subtotal);
+
+                totalVenta += subtotal;
+            }
+
+            int totalPedidos = dgvPedido.Rows.Count;
+            txtCantidadPedido.Text = totalPedidos.ToString();
+            txtTotalPagar.Text = totalVenta.ToString("N2");
+        }
+
+        // =====================
+        // NUEVO: Botón Cobrar
+        // =====================
+        private void btnCobrar_Click(object sender, EventArgs e)
+        {
+            if (dgvPedido.Rows.Count == 0)
+            {
+                MessageBox.Show("No hay productos o maquilas para cobrar.");
+                return;
+            }
+
+            DataTable detalle = ObtenerDetallePedidos();
+
+            string cliente = "CONSUMIDOR FINAL";
+            int numeroOrden = ObtenerNumeroOrden();
+
+            FACTURA frmFactura = new FACTURA(numeroOrden, cliente, detalle); // <-- ahora sin usuario
+            if (frmFactura.ShowDialog() == DialogResult.OK)
+            {
+                LimpiarPedidos();
+                ActualizarTotales();
+            }
+        }
+
+        // Devuelve el siguiente número de orden correlativo para la factura
+        private int ObtenerNumeroOrden()
+        {
+            string sql = "SELECT ISNULL(MAX(IDTransaccion), 0) FROM TRANSACCION";
+            DataTable dt = conexion.Tabla(sql);
+            int ultimoNumero = 0;
+            if (dt.Rows.Count > 0)
+                int.TryParse(dt.Rows[0][0].ToString(), out ultimoNumero);
+
+            return ultimoNumero + 1;
+        }
+
+        private void LimpiarCampos()
         {
             cmbProducto.SelectedIndex = -1;
             txtStockoporcent.Clear();
             txtPrecio.Clear();
             txtMaquila.Clear();
             nudCantidad.Value = 0;
-        }
 
-        private void ActualizarTotalPedidos()
-        {
-            int totalPedidos = dgvPedido.Rows.Count + dgvMaquila.Rows.Count;
-            txtCantidadPedido.Text = totalPedidos.ToString();
-        }
-
-        private void ActualizarTotalesGenerales()
-        {
-            // Total de venta: suma de subtotales y totales de ambos grids
-            decimal totalVenta = 0;
-            foreach (DataGridViewRow row in dgvPedido.Rows)
+            // Si está en modo maquila y es cliente, también limpiar campos específicos
+            if (OperacionEsMaquila() && radioButton1.Checked)
             {
-                totalVenta += Convert.ToDecimal(row.Cells["Subtotal"].Value);
-            }
-            foreach (DataGridViewRow row in dgvMaquila.Rows)
-            {
-                decimal total = (row.Cells["Total"].Value == DBNull.Value || row.Cells["Total"].Value == null)
-                    ? 0
-                    : Convert.ToDecimal(row.Cells["Total"].Value);
-                totalVenta += total;
-            }
-
-            // Total de pedidos: suma de filas de ambos grids
-            int totalPedidos = dgvPedido.Rows.Count + dgvMaquila.Rows.Count;
-
-            txtCantidadPedido.Text = totalPedidos.ToString();
-            txtTotalPagar.Text = totalVenta.ToString("N2");
-        }
-
-        private void ActualizarTotales()
-        {
-            ActualizarTotalesGenerales();
-        }
-
-        private void ActualizarTotalesMaquila()
-        {
-            ActualizarTotalesGenerales();
-        }
-
-        private void btnAgregar_Click(object sender, EventArgs e)
-        {
-            txtMaquila.Enabled = true;
-
-            string nombreProducto = cmbProducto.Text.Trim();
-            string categoria = "";
-            decimal precioUnitario = 0;
-            decimal porcentajeGerminacion = 1;
-            int cantidad = (int)nudCantidad.Value;
-
-            bool esMaquila = CBOperacion.SelectedItem != null && CBOperacion.SelectedItem.ToString() == "Maquila";
-            bool esStock = !esMaquila || (esMaquila && rbStock.Checked);
-
-            // --- VALIDACIÓN DE STOCK ---
-            if (esStock)
-            {
-                decimal stockDisponible = 0;
-                decimal.TryParse(txtStockoporcent.Text.Replace('.', ','), out stockDisponible);
-                if (cantidad > stockDisponible)
-                {
-                    MessageBox.Show("No puede agregar una cantidad mayor al stock disponible.");
-                    return;
-                }
-            }
-            // --- FIN VALIDACIÓN DE STOCK ---
-
-            DataRowView row = cmbProducto.SelectedItem as DataRowView;
-            bool productoExiste = (row != null);
-            decimal precioMaquila = 0;
-
-            if (esMaquila && radioButton1.Checked) // Maquila Cliente
-            {
-                // --- Validación de porcentaje ---
-                string textoPorcentaje = txtStockoporcent.Text.Trim().Replace('.', ',');
-                if (!decimal.TryParse(textoPorcentaje, out porcentajeGerminacion) || porcentajeGerminacion <= 0)
-                {
-                    MessageBox.Show("Ingrese un porcentaje de germinación válido (mayor a 0).");
-                    return;
-                }
-                if (porcentajeGerminacion > 1) porcentajeGerminacion = porcentajeGerminacion / 100;
-
-                if (!decimal.TryParse(txtMaquila.Text.Replace('.', ','), out precioMaquila) || precioMaquila < 0)
-                {
-                    MessageBox.Show("Ingrese un precio de maquila válido.");
-                    return;
-                }
-                int semillasRealistas = (int)Math.Round(cantidad * porcentajeGerminacion);
-                decimal totalMaquila = cantidad * precioMaquila;
-                dgvMaquila.Rows.Add(
-                    DBNull.Value, // no hay IDProducto en maquila cliente
-                    nombreProducto,
-                    porcentajeGerminacion,
-                    cantidad,
-                    semillasRealistas,
-                    precioMaquila,
-                    totalMaquila
-                );
-                ActualizarTotalesMaquila();
-            }
-            else if (esMaquila && productoExiste)
-            {
-                int idProducto = Convert.ToInt32(row["IDProducto"]);
-                categoria = row["Categoria"].ToString();
-                decimal.TryParse(row["PrecioUnitario"].ToString(), out precioUnitario);
-
-                // Calcula porcentaje germinación
-                string textoPorcentaje = txtStockoporcent.Text.Trim().Replace('.', ',');
-                if (!decimal.TryParse(textoPorcentaje, out porcentajeGerminacion) || porcentajeGerminacion <= 0)
-                    porcentajeGerminacion = 1;
-                if (porcentajeGerminacion > 1) porcentajeGerminacion = porcentajeGerminacion / 100;
-
-                int semillasRealistas = (int)Math.Round(cantidad * porcentajeGerminacion);
-
-                // Determinar precio de maquila: input usuario > valor en producto > fallback 0
-                if (string.IsNullOrWhiteSpace(txtMaquila.Text))
-                {
-                    if (row.Row.Table.Columns.Contains("PrecioMaquila") && row["PrecioMaquila"] != DBNull.Value)
-                        precioMaquila = Convert.ToDecimal(row["PrecioMaquila"]);
-                    else
-                        precioMaquila = 0;
-                }
-                else
-                {
-                    decimal.TryParse(txtMaquila.Text.Replace('.', ','), out precioMaquila);
-                }
-
-                if (precioMaquila < 0) precioMaquila = 0;
-
-                decimal totalVenta = cantidad * precioUnitario;
-                decimal totalMaquila = cantidad * precioMaquila;
-
-                dgvMaquila.Rows.Add(idProducto, nombreProducto + " (Maquila)", porcentajeGerminacion, cantidad, semillasRealistas, precioMaquila, totalMaquila);
-                ActualizarTotalesMaquila();
-            }
-            else
-            {
-                // Venta normal
-                if (row != null)
-                {
-                    int idProducto = Convert.ToInt32(row["IDProducto"]);
-                    categoria = row["Categoria"].ToString();
-                    decimal.TryParse(row["PrecioUnitario"].ToString(), out precioUnitario);
-
-                    decimal subtotal = cantidad * precioUnitario;
-
-                    // Aquí guardamos el IDProducto real en la fila
-                    dgvPedido.Rows.Add(idProducto, nombreProducto, categoria, cantidad, precioUnitario, subtotal);
-                    ActualizarTotales();
-                }
-                else
-                {
-                    MessageBox.Show("Seleccione un producto válido.");
-                }
-            }
-
-            nudCantidad.Value = 0;
-            txtMaquila.Text = "";
-        }
-
-
-
-        private void DgvPedido_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == dgvPedido.Columns["Cantidad"].Index)
-            {
-                // Validar y actualizar subtotal
-                DataGridViewRow fila = dgvPedido.Rows[e.RowIndex];
-                int cantidad = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-                decimal precioUnitario = Convert.ToDecimal(fila.Cells["PrecioUnitario"].Value);
-                fila.Cells["Subtotal"].Value = cantidad * precioUnitario;
-
-                // Actualizar totales
-                ActualizarTotales();
+                txtStockoporcent.ReadOnly = false;
+                txtStockoporcent.Enabled = true;
+                txtPrecio.Visible = false;
+                lblPrecio.Visible = false;
             }
         }
 
-        private void dgvMaquila_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == dgvMaquila.Columns["Cantidad"].Index)
-            {
-                // Validar y actualizar total
-                DataGridViewRow fila = dgvMaquila.Rows[e.RowIndex];
-                int cantidad = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-                decimal precioMaquila = Convert.ToDecimal(fila.Cells["PrecioMaquila"].Value);
-                decimal porcentajeGerminacion = Convert.ToDecimal(fila.Cells["PorcentajeGerminacion"].Value);
-                int semillasRealistas = (int)Math.Round(cantidad * porcentajeGerminacion);
-                fila.Cells["SemillasRealistas"].Value = semillasRealistas;
-                fila.Cells["Total"].Value = cantidad * precioMaquila;
-
-                // Actualizar totales
-                ActualizarTotalesMaquila();
-            }
-        }
-
-        private void DgvMaquila_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex == dgvMaquila.Columns["Eliminar"].Index)
-            {
-                // Eliminar fila de maquila
-                dgvMaquila.Rows.RemoveAt(e.RowIndex);
-                ActualizarTotalesMaquila();
-            }
-        }
-
+        // Event handler añadido: eliminar fila al pulsar el botón "Eliminar"
         private void DgvPedido_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex == dgvPedido.Columns["Eliminar"].Index)
+            if (e.RowIndex < 0) return;
+
+            // Asegurarse de que existe la columna "Eliminar"
+            if (dgvPedido.Columns.Contains("Eliminar") && e.ColumnIndex == dgvPedido.Columns["Eliminar"].Index)
             {
-                // Eliminar fila de pedido
                 dgvPedido.Rows.RemoveAt(e.RowIndex);
                 ActualizarTotales();
             }
         }
 
-        private void btnCancelarPedidos_Click(object sender, EventArgs e)
+        // Event handler añadido: actualizar subtotal cuando se edita la cantidad
+        private void DgvPedido_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            // Limpia el DataGridView de pedidos
-            dgvPedido.Rows.Clear();
-            // Limpia el DataGridView de maquila
-            dgvMaquila.Rows.Clear();
-            // Limpia los totales
-            txtCantidadPedido.Text = "0";
-            txtTotalPagar.Text = "0.00";
+            if (e.RowIndex < 0) return;
+
+            // Asegurarse de que existe la columna "Cantidad"
+            if (dgvPedido.Columns.Contains("Cantidad") && e.ColumnIndex == dgvPedido.Columns["Cantidad"].Index)
+            {
+                var fila = dgvPedido.Rows[e.RowIndex];
+                try
+                {
+                    decimal cantidad = 0m;
+                    decimal precioUnitario = 0m;
+
+                    if (fila.Cells["Cantidad"].Value != null && fila.Cells["Cantidad"].Value != DBNull.Value)
+                        decimal.TryParse(fila.Cells["Cantidad"].Value.ToString().Replace('.', ','), out cantidad);
+
+                    if (fila.Cells["PrecioUnitario"].Value != null && fila.Cells["PrecioUnitario"].Value != DBNull.Value)
+                        decimal.TryParse(fila.Cells["PrecioUnitario"].Value.ToString().Replace('.', ','), out precioUnitario);
+
+                    fila.Cells["Subtotal"].Value = cantidad * precioUnitario;
+                }
+                catch
+                {
+                    fila.Cells["Subtotal"].Value = 0m;
+                }
+
+                ActualizarTotales();
+            }
         }
 
         private void CmbProducto_KeyUp(object sender, KeyEventArgs e)
@@ -578,7 +550,7 @@ namespace Usuario
             if (productosOriginal == null || productosOriginal.Rows.Count == 0)
                 return;
 
-            string textoActual = cmbProducto.Text; // Guarda el texto actual
+            string textoActual = cmbProducto.Text;
             int posCursor = cmbProducto.SelectionStart;
 
             string filtro = textoActual.Trim().ToLower();
@@ -602,152 +574,19 @@ namespace Usuario
             cmbProducto.DisplayMember = "Producto";
             cmbProducto.ValueMember = "IDProducto";
 
-            cmbProducto.Text = textoActual; // Restaura el texto
-            cmbProducto.SelectionStart = posCursor; // Restaura la posición del cursor
+            cmbProducto.Text = textoActual;
+            cmbProducto.SelectionStart = posCursor;
             cmbProducto.DroppedDown = true;
         }
 
-        // Método para ocultar controles de maquila
-        private void OcultarControlesMaquila()
+        private void btnCancelarPedidos_Click(object sender, EventArgs e)
         {
-            lblMaquila.Visible = false;
-            txtMaquila.Visible = false;
-            radioButton1.Visible = false;
-            rbStock.Visible = false;
+            // Limpia las filas del pedido y actualiza los totales
+            LimpiarPedidos();
+
+            // Asegura valores por defecto en los campos de totales
+            txtCantidadPedido.Text = "0";
+            txtTotalPagar.Text = "0.00";
         }
-
-        // Método para mostrar controles de maquila
-        private void MostrarControlesMaquila()
-        {
-            lblMaquila.Visible = true;
-            txtMaquila.Visible = true;
-            txtMaquila.ReadOnly = false; // <-- Asegura que siempre sea editable
-            radioButton1.Visible = true;
-            rbStock.Visible = true;
-            rbStock.Checked = true;         // Activa por defecto el de stock
-            radioButton1.Checked = false;   // Desactiva el otro
-        }
-
-        private void dgvProductos_SelectionChanged(object sender, EventArgs e)
-        {
-            txtMaquila.Enabled = true; // Siempre habilitado
-                                       // Si quieres limpiar el campo al seleccionar, puedes dejar:
-                                       // txtMaquila.Text = "";
-        }
-        // Devuelve true si la operación seleccionada es "Maquila"
-        private bool OperacionEsMaquila()
-        {
-            return CBOperacion.SelectedItem != null && CBOperacion.SelectedItem.ToString() == "Maquila";
-        }
-
-        // Devuelve un DataTable con el detalle de los pedidos (solo productos, no maquila)
-        public DataTable ObtenerDetallePedidos()
-        {
-            DataTable detalle = new DataTable();
-            detalle.Columns.Add("IDProducto", typeof(int));
-            detalle.Columns.Add("Producto", typeof(string));
-            detalle.Columns.Add("Cantidad", typeof(decimal));
-            detalle.Columns.Add("PrecioUnitario", typeof(decimal));
-            detalle.Columns.Add("Subtotal", typeof(decimal));
-            detalle.Columns.Add("TipoOperacion", typeof(string));
-
-            // --- Pedidos normales (Venta) ---
-            foreach (DataGridViewRow row in dgvPedido.Rows)
-            {
-                if (row.IsNewRow) continue;
-
-                int idProducto = row.Cells["IDProducto"].Value != null && row.Cells["IDProducto"].Value != DBNull.Value
-                    ? Convert.ToInt32(row.Cells["IDProducto"].Value)
-                    : 0;
-
-                detalle.Rows.Add(
-                    idProducto,
-                    row.Cells["Producto"].Value?.ToString() ?? "",
-                    row.Cells["Cantidad"].Value != null ? Convert.ToDecimal(row.Cells["Cantidad"].Value) : 0,
-                    row.Cells["PrecioUnitario"].Value != null ? Convert.ToDecimal(row.Cells["PrecioUnitario"].Value) : 0,
-                    row.Cells["Subtotal"].Value != null ? Convert.ToDecimal(row.Cells["Subtotal"].Value) : 0,
-                    "Venta"
-                );
-            }
-
-            // --- Pedidos de maquila ---
-            foreach (DataGridViewRow row in dgvMaquila.Rows)
-            {
-                if (row.IsNewRow) continue;
-
-                int idProducto = row.Cells["IDProducto"].Value != null && row.Cells["IDProducto"].Value != DBNull.Value
-                    ? Convert.ToInt32(row.Cells["IDProducto"].Value)
-                    : 0;
-
-                string producto = row.Cells["Producto"].Value?.ToString() ?? "";
-                decimal precioUnitario = 0;
-                if (dgvMaquila.Columns.Contains("PrecioMaquila"))
-                    precioUnitario = row.Cells["PrecioMaquila"].Value != null ? Convert.ToDecimal(row.Cells["PrecioMaquila"].Value) : 0;
-                else if (dgvMaquila.Columns.Contains("PrecioUnitario"))
-                    precioUnitario = row.Cells["PrecioUnitario"].Value != null ? Convert.ToDecimal(row.Cells["PrecioUnitario"].Value) : 0;
-
-                decimal total = row.Cells["Total"].Value != null ? Convert.ToDecimal(row.Cells["Total"].Value) : 0;
-                decimal cantidad = row.Cells["Cantidad"].Value != null ? Convert.ToDecimal(row.Cells["Cantidad"].Value) : 0;
-
-                string tipoOperacion = producto.Contains("(Maquila)") ? "Maquila" : "Venta";
-
-                detalle.Rows.Add(idProducto, producto, cantidad, precioUnitario, total, tipoOperacion);
-            }
-
-            return detalle;
-        }
-
-
-        // Limpia los pedidos y actualiza los totales
-        public void LimpiarPedidos()
-        {
-            dgvPedido.Rows.Clear();
-            ActualizarTotales();
-        }
-
-
-
-        // Métodos de configuración de DataGridView, carga de productos, búsqueda, agregar productos, etc...
-        // (se dejan tal cual ya los tenías)
-
-        // =======================
-        // NUEVO: Botón Cobrar
-        // =======================
-        private void btnCobrar_Click(object sender, EventArgs e)
-        {
-            if (dgvPedido.Rows.Count == 0 && dgvMaquila.Rows.Count == 0)
-            {
-                MessageBox.Show("No hay productos o maquilas para cobrar.");
-                return;
-            }
-
-            DataTable detalle = ObtenerDetallePedidos();
-
-            string cliente = "CONSUMIDOR FINAL";
-            int numeroOrden = ObtenerNumeroOrden();
-
-            FACTURA frmFactura = new FACTURA(numeroOrden, cliente, detalle); // <-- ahora sin usuario
-            if (frmFactura.ShowDialog() == DialogResult.OK)
-            {
-                LimpiarPedidos();
-                dgvMaquila.Rows.Clear();
-                ActualizarTotales();
-            }
-        }
-
-
-        // Devuelve el siguiente número de orden correlativo para la factura
-        private int ObtenerNumeroOrden()
-        {
-            string sql = "SELECT ISNULL(MAX(IDTransaccion), 0) FROM TRANSACCION";
-            DataTable dt = conexion.Tabla(sql);
-            int ultimoNumero = 0;
-            if (dt.Rows.Count > 0)
-                int.TryParse(dt.Rows[0][0].ToString(), out ultimoNumero);
-
-            return ultimoNumero + 1;
-        }
-
-
     }
 }
