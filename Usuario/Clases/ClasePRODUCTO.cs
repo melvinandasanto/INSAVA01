@@ -18,6 +18,7 @@ namespace Usuario
         private decimal _cantidad;
         private decimal _precioUnitario;
         private decimal? _porcentajeGerminacion;
+        private decimal? _precioMaquila;
         private int? _idProveedor;
         private bool _activo;
 
@@ -48,7 +49,6 @@ namespace Usuario
             set => _nombre = value;
         }
 
-
         public decimal Cantidad
         {
             get => _cantidad;
@@ -65,6 +65,12 @@ namespace Usuario
         {
             get => _porcentajeGerminacion;
             set => _porcentajeGerminacion = value;
+        }
+
+        public decimal? PrecioMaquila
+        {
+            get => _precioMaquila;
+            set => _precioMaquila = value;
         }
 
         public int? IDProveedor
@@ -87,6 +93,7 @@ namespace Usuario
             _cantidad = 0;
             _precioUnitario = 0;
             _porcentajeGerminacion = null;
+            _precioMaquila = null;
             _idProveedor = null;
             _activo = true;
         }
@@ -102,6 +109,10 @@ namespace Usuario
                 ["PorcentajeGerminacion"] = (string.Equals(_categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
                               || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
                              ? (_porcentajeGerminacion.HasValue ? (object)_porcentajeGerminacion.Value : (object)DBNull.Value)
+                             : (object)DBNull.Value,
+                ["PrecioMaquila"] = (string.Equals(_categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+                             ? (_precioMaquila.HasValue ? (object)_precioMaquila.Value : (object)DBNull.Value)
                              : (object)DBNull.Value,
                 ["IDProveedor"] = _idProveedor.HasValue ? (object)_idProveedor.Value : DBNull.Value,
                 ["Activo"] = _activo ? 1 : 0
@@ -125,7 +136,10 @@ namespace Usuario
                               || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
                              ? (_porcentajeGerminacion.HasValue ? (object)_porcentajeGerminacion.Value : (object)DBNull.Value)
                              : (object)DBNull.Value,
-
+                ["PrecioMaquila"] = (string.Equals(_categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(_categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
+                             ? (_precioMaquila.HasValue ? (object)_precioMaquila.Value : (object)DBNull.Value)
+                             : (object)DBNull.Value,
                 ["IDProveedor"] = _idProveedor.HasValue ? (object)_idProveedor.Value : DBNull.Value,
                 ["Activo"] = _activo ? 1 : 0
             };
@@ -157,6 +171,9 @@ namespace Usuario
                 _cantidad = Convert.ToDecimal(row["Cantidad"]);
                 _precioUnitario = Convert.ToDecimal(row["PrecioUnitario"]);
                 _porcentajeGerminacion = row["PorcentajeGerminacion"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(row["PorcentajeGerminacion"]);
+                _precioMaquila = row.Table.Columns.Contains("PrecioMaquila") && row["PrecioMaquila"] != DBNull.Value
+                                 ? (decimal?)Convert.ToDecimal(row["PrecioMaquila"])
+                                 : (decimal?)null;
                 _idProveedor = row["IDProveedor"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["IDProveedor"]);
                 _activo = Convert.ToBoolean(row["Activo"]);
                 return true;
@@ -227,7 +244,11 @@ namespace Usuario
             bool baseValido = !string.IsNullOrWhiteSpace(Nombre) && Cantidad >= 0 && PrecioUnitario >= 0;
             bool requiereGerm = string.Equals(Categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
                               || string.Equals(Categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase);
-            if (requiereGerm && !PorcentajeGerminacion.HasValue) return false;
+            if (requiereGerm)
+            {
+                if (!PorcentajeGerminacion.HasValue) return false;
+                if (!PrecioMaquila.HasValue) return false;
+            }
             return baseValido;
         }
 

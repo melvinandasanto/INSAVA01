@@ -73,7 +73,6 @@ CREATE TABLE USUARIO (
 );
 GO
 
--- 4. Inventario y productos
 CREATE TABLE PRODUCTO (
     IDProducto INT IDENTITY(1,1) PRIMARY KEY,
     Categoria VARCHAR(50) NOT NULL,
@@ -81,18 +80,26 @@ CREATE TABLE PRODUCTO (
     Cantidad DECIMAL(10,2) NOT NULL DEFAULT 0,
     PrecioUnitario DECIMAL(10,2) NOT NULL DEFAULT 0,
     PorcentajeGerminacion DECIMAL(4,2) CHECK (PorcentajeGerminacion BETWEEN 0 AND 1),
+    PrecioMaquila DECIMAL(10,2) NULL,
     IDProveedor INT NULL,
     Activo BIT NOT NULL DEFAULT 1,
     CONSTRAINT FK_Producto_Proveedor FOREIGN KEY (IDProveedor)
         REFERENCES PROVEEDOR(IDProveedor),
     CONSTRAINT CK_Producto_PorcentajeGerminacion_Semilla
-CHECK (
-    (Categoria IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NOT NULL)
-    OR
-    (Categoria NOT IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NULL)
-)
+        CHECK (
+            (Categoria IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NOT NULL)
+            OR
+            (Categoria NOT IN ('Semilla', 'Semilla Maquilada') AND PorcentajeGerminacion IS NULL)
+        ),
+    CONSTRAINT CK_Producto_PrecioMaquila_Semilla
+        CHECK (
+            (Categoria IN ('Semilla', 'Semilla Maquilada') AND PrecioMaquila IS NOT NULL)
+            OR
+            (Categoria NOT IN ('Semilla', 'Semilla Maquilada') AND PrecioMaquila IS NULL)
+        )
 );
 GO
+
 
 -- 5. Operaciones de venta y servicio
 CREATE TABLE TRANSACCION (
@@ -228,7 +235,8 @@ SELECT
         WHEN Categoria IN ('Semilla', 'Semilla maquilada') THEN CAST(ISNULL(PorcentajeGerminacion * 100, 0) AS DECIMAL(5,2))
         ELSE NULL
     END AS PorcentajeGerminacion,
-    PrecioUnitario
+    PrecioUnitario,
+    PrecioMaquila
 FROM PRODUCTO
 WHERE Activo = 1;
 GO
@@ -321,21 +329,20 @@ INSERT INTO PROVEEDOR (NombreProveedor, TelefonoProveedor, Activo) VALUES
 ('Semillas Premium', '23001122', 1),
 ('VerdeVida', '23112233', 1);
 
-
--- PRODUCTO (relacionados a su proveedor, usando IDProveedor del 1 al 10)
-INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGerminacion, IDProveedor, Activo) VALUES
-('Semilla', 'Maíz Amarillo', 100, 25.00, 0.95, 1, 1),
-('Semilla', 'Frijol Rojo', 80, 30.00, 0.92, 2, 1),
-('Semilla', 'Arroz Integral', 120, 20.00, 0.90, 3, 1),
-('Semilla', 'Sorgo Blanco', 60, 18.00, 0.93, 4, 1),
-('Semilla', 'Cilantro', 200, 5.00, 0.85, 5, 1),
-('Semilla', 'Tomate Cherry', 150, 12.00, 0.88, 6, 1),
-('Semilla', 'Pepino', 90, 10.00, 0.87, 7, 1),
-('Semilla', 'Zanahoria', 110, 8.00, 0.89,  8, 1),
-('Semilla', 'Lechuga Romana', 130, 9.00, 0.91,  9, 1),
-('Semilla', 'Espinaca', 140, 7.00, 0.90,  10, 1),
-('Producto', 'Fertilizante Orgánico', 50, 15.00, NULL,  1, 1),
-('Producto', 'Insecticida Natural', 30, 10.00, NULL,  2, 1),
-('Producto', 'Fungicida Biológico', 20, 12.00, NULL,  3, 1),
-('Producto', 'Herbicida Selectivo', 10, 18.00, NULL, 4, 1);
+-- PRODUCTO (adaptado con PrecioMaquila obligatorio para Semilla y Semilla Maquilada)
+INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGerminacion, PrecioMaquila, IDProveedor, Activo) VALUES
+('Semilla', 'Maíz Amarillo', 100, 25.00, 0.95, 5.00, 1, 1),
+('Semilla', 'Frijol Rojo', 80, 30.00, 0.92, 6.00, 2, 1),
+('Semilla', 'Arroz Integral', 120, 20.00, 0.90, 4.50, 3, 1),
+('Semilla', 'Sorgo Blanco', 60, 18.00, 0.93, 4.00, 4, 1),
+('Semilla', 'Cilantro', 200, 5.00, 0.85, 1.00, 5, 1),
+('Semilla', 'Tomate Cherry', 150, 12.00, 0.88, 2.50, 6, 1),
+('Semilla', 'Pepino', 90, 10.00, 0.87, 2.00, 7, 1),
+('Semilla', 'Zanahoria', 110, 8.00, 0.89, 1.80, 8, 1),
+('Semilla', 'Lechuga Romana', 130, 9.00, 0.91, 2.20, 9, 1),
+('Semilla', 'Espinaca', 140, 7.00, 0.90, 1.50, 10, 1),
+('Producto', 'Fertilizante Orgánico', 50, 15.00, NULL, NULL, 1, 1),
+('Producto', 'Insecticida Natural', 30, 10.00, NULL, NULL, 2, 1),
+('Producto', 'Fungicida Biológico', 20, 12.00, NULL, NULL, 3, 1),
+('Producto', 'Herbicida Selectivo', 10, 18.00, NULL, NULL, 4, 1);
 GO

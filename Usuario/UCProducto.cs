@@ -26,6 +26,8 @@ namespace Usuario
         private void UCProducto_Load(object sender, EventArgs e)
         {
             txtGerminacion.Enabled = false;
+            txtPrecioMaquila.Enabled = false;
+
             CargarProductos();
             CargarProveedores();
             CargarCategorias();
@@ -37,13 +39,15 @@ namespace Usuario
             NUPCantidad.ValueChanged += ControlModificado;
             txtPrecioUnitario.TextChanged += ControlModificado;
             txtGerminacion.TextChanged += ControlModificado;
+            txtPrecioMaquila.TextChanged += ControlModificado;
             CBProveedor.SelectedIndexChanged += ControlModificado;
             checkactivo.CheckedChanged += ControlModificado;
             EstadoInicial();
             CamposDecimales = new List<TextBox>
             {
                 txtPrecioUnitario,
-                txtGerminacion
+                txtGerminacion,
+                txtPrecioMaquila
             };
             // Fix for the CS7036 error: Pass the required "txt" parameter to the ValidarCampoDecimal method.
             CamposDecimales.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoDecimal(ev, campo));
@@ -151,10 +155,22 @@ namespace Usuario
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
+
+                // Precio de maquila (obligatorio para semilla según restricción DB)
+                string textoPrecioMaquila = txtPrecioMaquila.Text?.Trim();
+                textoPrecioMaquila = textoPrecioMaquila?.Replace(',', '.');
+                if (string.IsNullOrWhiteSpace(textoPrecioMaquila) ||
+                    !decimal.TryParse(textoPrecioMaquila, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal pmq))
+                {
+                    MessageBox.Show("Debe ingresar el precio de maquila para productos de la categoría Semilla.");
+                    return;
+                }
+                producto.PrecioMaquila = Math.Round(pmq, 2);
             }
             else
             {
                 producto.PorcentajeGerminacion = null;
+                producto.PrecioMaquila = null;
             }
 
             // Proveedor robusto: manejar DBNull, DataRowView, string o int
@@ -260,10 +276,22 @@ namespace Usuario
                     return;
                 }
                 producto.PorcentajeGerminacion = germ;
+
+                // Precio de maquila (obligatorio para semilla)
+                string textoPrecioMaquila = txtPrecioMaquila.Text?.Trim();
+                textoPrecioMaquila = textoPrecioMaquila?.Replace(',', '.');
+                if (string.IsNullOrWhiteSpace(textoPrecioMaquila) ||
+                    !decimal.TryParse(textoPrecioMaquila, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal pmq))
+                {
+                    MessageBox.Show("Debe ingresar el precio de maquila para productos de la categoría Semilla.");
+                    return;
+                }
+                producto.PrecioMaquila = Math.Round(pmq, 2);
             }
             else
             {
                 producto.PorcentajeGerminacion = null;
+                producto.PrecioMaquila = null;
             }
 
             // Proveedor
@@ -364,6 +392,7 @@ namespace Usuario
                 NUPCantidad.Value = data["Cantidad"] != DBNull.Value ? Convert.ToDecimal(data["Cantidad"]) : 0;
                 txtPrecioUnitario.Text = data["PrecioUnitario"].ToString();
                 txtGerminacion.Text = data["PorcentajeGerminacion"].ToString();
+                txtPrecioMaquila.Text = data.Table.Columns.Contains("PrecioMaquila") && data["PrecioMaquila"] != DBNull.Value ? data["PrecioMaquila"].ToString() : "";
                 CBProveedor.SelectedValue = data["IDProveedor"] != DBNull.Value ? (int?)Convert.ToInt32(data["IDProveedor"]) : null;
                 checkactivo.Checked = data["Activo"] != DBNull.Value ? Convert.ToBoolean(data["Activo"]) : false;
 
@@ -376,6 +405,7 @@ namespace Usuario
                     { "NUPCantidad", NUPCantidad.Value },
                     { "txtPrecioUnitario", txtPrecioUnitario.Text },
                     { "txtGerminacion", txtGerminacion.Text },
+                    { "txtPrecioMaquila", txtPrecioMaquila.Text },
                     { "CBProveedor", CBProveedor.SelectedValue },
                     { "checkactivo", checkactivo.Checked }
                 };
@@ -386,6 +416,7 @@ namespace Usuario
                 NUPCantidad.Enabled = true;
                 txtPrecioUnitario.Enabled = true;
                 txtGerminacion.Enabled = true;
+                txtPrecioMaquila.Enabled = true;
                 CBProveedor.Enabled = true;
                 checkactivo.Enabled = true;
 
@@ -432,6 +463,7 @@ namespace Usuario
             NUPCantidad.Value = (decimal)valoresOriginales["NUPCantidad"];
             txtPrecioUnitario.Text = valoresOriginales["txtPrecioUnitario"].ToString();
             txtGerminacion.Text = valoresOriginales["txtGerminacion"].ToString();
+            txtPrecioMaquila.Text = valoresOriginales["txtPrecioMaquila"].ToString();
             CBProveedor.SelectedValue = valoresOriginales["CBProveedor"];
             checkactivo.Checked = (bool)valoresOriginales["checkactivo"];
 
@@ -441,6 +473,7 @@ namespace Usuario
             NUPCantidad.Enabled = true;
             txtPrecioUnitario.Enabled = true;
             txtGerminacion.Enabled = true;
+            txtPrecioMaquila.Enabled = true;
             CBProveedor.Enabled = true;
             checkactivo.Enabled = true;
 
@@ -459,6 +492,7 @@ namespace Usuario
             NUPCantidad.Value = 0;
             txtPrecioUnitario.Text = "";
             txtGerminacion.Text = "";
+            txtPrecioMaquila.Text = "";
             CBProveedor.SelectedIndex = -1;
             checkactivo.Checked = false;
             valoresOriginales = null;
@@ -472,6 +506,7 @@ namespace Usuario
             NUPCantidad.Enabled = false;
             txtPrecioUnitario.Enabled = false;
             txtGerminacion.Enabled = false;
+            txtPrecioMaquila.Enabled = false;
             CBProveedor.Enabled = false;
             checkactivo.Enabled = false;
 
@@ -490,6 +525,7 @@ namespace Usuario
             NUPCantidad.Enabled = true;
             txtPrecioUnitario.Enabled = true;
             txtGerminacion.Enabled = true;
+            txtPrecioMaquila.Enabled = true;
             CBProveedor.Enabled = true;
             checkactivo.Enabled = true;
         }
@@ -510,6 +546,7 @@ namespace Usuario
                 NUPCantidad.Value != Convert.ToDecimal(valoresOriginales["NUPCantidad"]) ||
                 txtPrecioUnitario.Text != valoresOriginales["txtPrecioUnitario"].ToString() ||
                 txtGerminacion.Text != valoresOriginales["txtGerminacion"].ToString() ||
+                txtPrecioMaquila.Text != valoresOriginales["txtPrecioMaquila"].ToString() ||
                 (CBProveedor.SelectedValue == null ? "" : CBProveedor.SelectedValue.ToString()) !=
                     (valoresOriginales["CBProveedor"] == null ? "" : valoresOriginales["CBProveedor"].ToString()) ||
                 checkactivo.Checked != (bool)valoresOriginales["checkactivo"];
@@ -574,15 +611,24 @@ namespace Usuario
             {
                 txtGerminacion.Enabled = true;
                 txtGerminacion.Text = ""; // Limpia el campo para evitar valores residuales
+                txtPrecioMaquila.Enabled = true;
+                txtPrecioMaquila.Text = "";
             }
             else
             {
                 txtGerminacion.Enabled = false;
                 txtGerminacion.Text = ""; // Limpia el campo
+                txtPrecioMaquila.Enabled = false;
+                txtPrecioMaquila.Text = "";
             }
         }
 
         private void UCProducto_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }

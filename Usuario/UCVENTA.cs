@@ -24,9 +24,9 @@ namespace Usuario
             InitializeComponent();
             conexion = new ClaseConexion();
             DiseñoGlobal.RegistrarUserControl(this);
-        
-         // Inicializa el DataGridView de maquila
-           dgvMaquila = new DataGridView();
+
+            // Inicializa el DataGridView de maquila
+            dgvMaquila = new DataGridView();
             dgvMaquila.Name = "dgvMaquila";
             dgvMaquila.Visible = false;
             dgvMaquila.Anchor = dgvPedido.Anchor;
@@ -53,18 +53,21 @@ namespace Usuario
             dgvMaquila.CellClick += DgvMaquila_CellClick;
             dgvMaquila.CellEndEdit += dgvMaquila_CellEndEdit;
             CamposDecimales = new List<TextBox>
+                {
+                    txtPrecio,
+                    txtStockoporcent,
+                    txtMaquila
+                };
+            CamposDecimales.ForEach(campo =>
             {
-                txtPrecio,
-                txtStockoporcent,
-                txtMaquila
-            };
-            CamposDecimales.ForEach(campo => {
                 // Validación para solo permitir caracteres válidos de decimal
-                campo.KeyPress += (s, ev) => {
+                campo.KeyPress += (s, ev) =>
+                {
                     ClaseValidacion.ValidarCampoDecimal(ev, campo);
                 };
                 // Validación para no permitir valores negativos
-                campo.Validating += (s, ev) => {
+                campo.Validating += (s, ev) =>
+                {
                     decimal valor;
                     if (decimal.TryParse(campo.Text.Replace('.', ','), out valor))
                     {
@@ -129,7 +132,8 @@ namespace Usuario
             dgvMaquila.Columns.Add("PorcentajeGerminacion", "Germinación");
             dgvMaquila.Columns.Add("Cantidad", "Cantidad");
             dgvMaquila.Columns.Add("SemillasRealistas", "Plantulas");
-            dgvMaquila.Columns.Add("PrecioUnitario", "Precio Unitario");
+            // Ahora guardamos precio de maquila en esta columna
+            dgvMaquila.Columns.Add("PrecioMaquila", "Precio Maquila");
             dgvMaquila.Columns.Add("Total", "Total");
             DataGridViewButtonColumn btnEliminar = new DataGridViewButtonColumn
             {
@@ -150,12 +154,12 @@ namespace Usuario
             // Validar el modo de operación
             if (CBOperacion.SelectedItem != null && CBOperacion.SelectedItem.ToString() == "Maquila")
             {
-                sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario FROM VISTAPRODUCTOS WHERE Categoria IN ('Semilla', 'Semilla maquilada')";
+                sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario, PrecioMaquila FROM VISTAPRODUCTOS WHERE Categoria IN ('Semilla', 'Semilla maquilada')";
             }
             else
             {
                 // Incluye todas las categorías relevantes, incluyendo 'Semilla maquilada'
-                sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario FROM VISTAPRODUCTOS";
+                sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario, PrecioMaquila FROM VISTAPRODUCTOS";
             }
             productosOriginal = conexion.Tabla(sql);
 
@@ -190,7 +194,7 @@ namespace Usuario
                 radioButton1.Visible = true;
                 CargarSemillasCombo();
                 rbStock.Checked = true; // Selecciona por defecto "Stock"
-                // Forzar evento CheckedChanged para aplicar lógica
+                                        // Forzar evento CheckedChanged para aplicar lógica
                 RbStock_CheckedChanged(rbStock, EventArgs.Empty);
                 MostrarControlesMaquila();
             }
@@ -230,7 +234,7 @@ namespace Usuario
 
         private void CargarSemillasCombo()
         {
-            string sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario FROM VISTAPRODUCTOS WHERE Categoria IN ('Semilla', 'Semilla maquilada')";
+            string sql = "SELECT IDProducto, Producto, Categoria, PrecioUnitario, PrecioMaquila FROM VISTAPRODUCTOS WHERE Categoria IN ('Semilla', 'Semilla maquilada')";
             productosOriginal = conexion.Tabla(sql);
             cmbProducto.DataSource = productosOriginal.Copy();
             cmbProducto.DisplayMember = "Producto";
@@ -250,12 +254,17 @@ namespace Usuario
             if (cmbProducto.Items.Count > 0 && cmbProducto.SelectedIndex >= 0 && cmbProducto.SelectedValue != null)
             {
                 int idProducto = Convert.ToInt32(cmbProducto.SelectedValue);
-                string sql = "SELECT Cantidad AS Stock, PrecioUnitario, PorcentajeGerminacion FROM PRODUCTO WHERE IDProducto=@id";
+                string sql = "SELECT Cantidad AS Stock, PrecioUnitario, PorcentajeGerminacion, PrecioMaquila FROM PRODUCTO WHERE IDProducto=@id";
                 SqlParameter[] parametros = { new SqlParameter("@id", idProducto) };
                 DataTable dt = conexion.Tabla(sql, parametros);
 
                 if (dt.Rows.Count > 0)
                 {
+                    // llenar txtMaquila con valor por defecto si existe
+                    string precioMaquilaText = dt.Rows[0].Table.Columns.Contains("PrecioMaquila") && dt.Rows[0]["PrecioMaquila"] != DBNull.Value
+                                               ? dt.Rows[0]["PrecioMaquila"].ToString()
+                                               : "";
+
                     if (esMaquilaCliente)
                     {
                         lblestock.Text = "%";
@@ -264,6 +273,7 @@ namespace Usuario
                         txtPrecio.Visible = false;
                         lblPrecio.Visible = false;
                         txtStockoporcent.Text = dt.Rows[0]["PorcentajeGerminacion"].ToString();
+                        txtMaquila.Text = precioMaquilaText;
                         nudCantidad.Maximum = 1000000; // Sin límite real para maquila cliente
                         nudCantidad.Value = 0;
                         return;
@@ -278,6 +288,7 @@ namespace Usuario
                         lblPrecio.Visible = true;
                         txtPrecio.Text = dt.Rows[0]["PrecioUnitario"].ToString();
                         txtMaquila.Enabled = true;
+                        txtMaquila.Text = precioMaquilaText;
 
                         // Asignar el máximo del NumericUpDown según el stock
                         decimal stockDisponible = 0;
@@ -295,6 +306,7 @@ namespace Usuario
                     lblPrecio.Visible = true;
                     txtPrecio.Text = dt.Rows[0]["PrecioUnitario"].ToString();
                     txtMaquila.Enabled = esMaquila;
+                    txtMaquila.Text = precioMaquilaText;
 
                     // Asignar el máximo del NumericUpDown según el stock
                     decimal stockDisponible2 = 0;
@@ -333,6 +345,7 @@ namespace Usuario
             cmbProducto.SelectedIndex = -1;
             txtStockoporcent.Clear();
             txtPrecio.Clear();
+            txtMaquila.Clear();
             nudCantidad.Value = 0;
         }
 
@@ -447,7 +460,20 @@ namespace Usuario
                 if (porcentajeGerminacion > 1) porcentajeGerminacion = porcentajeGerminacion / 100;
 
                 int semillasRealistas = (int)Math.Round(cantidad * porcentajeGerminacion);
-                decimal.TryParse(txtMaquila.Text.Replace('.', ','), out precioMaquila);
+
+                // Determinar precio de maquila: input usuario > valor en producto > fallback 0
+                if (string.IsNullOrWhiteSpace(txtMaquila.Text))
+                {
+                    if (row.Row.Table.Columns.Contains("PrecioMaquila") && row["PrecioMaquila"] != DBNull.Value)
+                        precioMaquila = Convert.ToDecimal(row["PrecioMaquila"]);
+                    else
+                        precioMaquila = 0;
+                }
+                else
+                {
+                    decimal.TryParse(txtMaquila.Text.Replace('.', ','), out precioMaquila);
+                }
+
                 if (precioMaquila < 0) precioMaquila = 0;
 
                 decimal totalVenta = cantidad * precioUnitario;
@@ -505,11 +531,11 @@ namespace Usuario
                 // Validar y actualizar total
                 DataGridViewRow fila = dgvMaquila.Rows[e.RowIndex];
                 int cantidad = Convert.ToInt32(fila.Cells["Cantidad"].Value);
-                decimal precioUnitario = Convert.ToDecimal(fila.Cells["PrecioUnitario"].Value);
+                decimal precioMaquila = Convert.ToDecimal(fila.Cells["PrecioMaquila"].Value);
                 decimal porcentajeGerminacion = Convert.ToDecimal(fila.Cells["PorcentajeGerminacion"].Value);
                 int semillasRealistas = (int)Math.Round(cantidad * porcentajeGerminacion);
                 fila.Cells["SemillasRealistas"].Value = semillasRealistas;
-                fila.Cells["Total"].Value = cantidad * precioUnitario;
+                fila.Cells["Total"].Value = cantidad * precioMaquila;
 
                 // Actualizar totales
                 ActualizarTotalesMaquila();
@@ -605,8 +631,8 @@ namespace Usuario
         private void dgvProductos_SelectionChanged(object sender, EventArgs e)
         {
             txtMaquila.Enabled = true; // Siempre habilitado
-            // Si quieres limpiar el campo al seleccionar, puedes dejar:
-            // txtMaquila.Text = "";
+                                       // Si quieres limpiar el campo al seleccionar, puedes dejar:
+                                       // txtMaquila.Text = "";
         }
         // Devuelve true si la operación seleccionada es "Maquila"
         private bool OperacionEsMaquila()
@@ -654,7 +680,12 @@ namespace Usuario
                     : 0;
 
                 string producto = row.Cells["Producto"].Value?.ToString() ?? "";
-                decimal precioUnitario = row.Cells["PrecioUnitario"].Value != null ? Convert.ToDecimal(row.Cells["PrecioUnitario"].Value) : 0;
+                decimal precioUnitario = 0;
+                if (dgvMaquila.Columns.Contains("PrecioMaquila"))
+                    precioUnitario = row.Cells["PrecioMaquila"].Value != null ? Convert.ToDecimal(row.Cells["PrecioMaquila"].Value) : 0;
+                else if (dgvMaquila.Columns.Contains("PrecioUnitario"))
+                    precioUnitario = row.Cells["PrecioUnitario"].Value != null ? Convert.ToDecimal(row.Cells["PrecioUnitario"].Value) : 0;
+
                 decimal total = row.Cells["Total"].Value != null ? Convert.ToDecimal(row.Cells["Total"].Value) : 0;
                 decimal cantidad = row.Cells["Cantidad"].Value != null ? Convert.ToDecimal(row.Cells["Cantidad"].Value) : 0;
 
@@ -717,6 +748,6 @@ namespace Usuario
             return ultimoNumero + 1;
         }
 
-       
+
     }
 }

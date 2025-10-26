@@ -21,10 +21,10 @@ namespace Usuario
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Ruta al script de la base de datos
-            string rutaScript = @"C:\Users\cmarc\source\repos\INSAVA\BasedeDatos";
+            string rutaScript = @"C:\Users\melvi\source\repos\INSAVA\BasedeDatos";
 
             // Crear conexión temporal solo para pruebas
-            var conexion = new ClaseConexion("MARCELAPACHECO\\MSSQLSERVER05", "SISTEMASEMILLA");
+            var conexion = new ClaseConexion("DESKTOP-CE353KH", "SISTEMASEMILLA");
 
             if (!conexion.VerificarServidor())
             {
