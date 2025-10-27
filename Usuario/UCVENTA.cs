@@ -18,6 +18,9 @@ namespace Usuario
         private DataTable productosOriginal;
         private List<TextBox> CamposDecimales;
 
+        // Agregar campo privado para saber si el producto fue leído desde la BD
+        private bool productoLeido = false;
+
         public UCVENTA()
         {
             InitializeComponent();
@@ -163,6 +166,9 @@ namespace Usuario
                 MostrarControlesMaquila();
                 CargarSemillasCombo();
             }
+
+            // Mantener compatibilidad con el evento existente si lo hay
+            UpdateControlsForClienteRadio();
         }
 
         private void RbStock_CheckedChanged(object sender, EventArgs e)
@@ -182,19 +188,7 @@ namespace Usuario
         }
         private void RadioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            if (radioButton1.Checked)
-            {
-                txtStockoporcent.ReadOnly = false;
-                txtStockoporcent.Enabled = true;
-                txtPrecio.ReadOnly = true;
-                txtPrecio.Visible = false;
-                lblPrecio.Visible = false;
-                if (OperacionEsMaquila())
-                {
-                    lblestock.Text = "%";
-                    txtStockoporcent.Text = "";
-                }
-            }
+            UpdateControlsForClienteRadio();
         }
 
         private void CargarSemillasCombo()
@@ -271,6 +265,9 @@ namespace Usuario
             decimal.TryParse(row["Stock"].ToString(), out stock);
             nudCantidad.Maximum = stock > 0 ? stock : 1;
             nudCantidad.Value = 0;
+
+            productoLeido = true; // Marcar como leído
+            UpdateControlsForClienteRadio(); // asegurar estado correcto de UI
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
@@ -499,6 +496,9 @@ namespace Usuario
                 txtPrecio.Visible = false;
                 lblPrecio.Visible = false;
             }
+
+            productoLeido = false; // ya no es un producto leído de BD
+            UpdateControlsForClienteRadio();
         }
 
         // Event handler añadido: eliminar fila al pulsar el botón "Eliminar"
@@ -577,6 +577,9 @@ namespace Usuario
             cmbProducto.Text = textoActual;
             cmbProducto.SelectionStart = posCursor;
             cmbProducto.DroppedDown = true;
+
+            productoLeido = false;
+            UpdateControlsForClienteRadio();
         }
 
         private void btnCancelarPedidos_Click(object sender, EventArgs e)
@@ -592,6 +595,28 @@ namespace Usuario
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        // Llamar a este método desde los manejadores relevantes para mantener UI consistente
+        private void UpdateControlsForClienteRadio()
+        {
+            bool operacionMaquila = CBOperacion?.SelectedItem != null &&
+                                    CBOperacion.SelectedItem.ToString().IndexOf("Maquila", StringComparison.OrdinalIgnoreCase) >= 0;
+
+            if (radioButton1.Checked && operacionMaquila && !productoLeido)
+            {
+                // Nuevo producto en modo Maquila+Cliente -> ocultar precio y mostrar %
+                txtPrecio.Visible = false;
+                lblPrecio.Visible = false;
+                lblestock.Text = "%";
+            }
+            else
+            {
+                // Resto de casos -> estado normal
+                txtPrecio.Visible = true;
+                lblPrecio.Visible = true;
+                lblestock.Text = "Stock";
+            }
         }
     }
 }
