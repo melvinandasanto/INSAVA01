@@ -273,7 +273,7 @@ namespace Usuario
             nudCantidad.Value = 0;
         }
 
-        private void BtnAgregar_Click(object sender, EventArgs e)
+        private void btnAgregar_Click(object sender, EventArgs e)
         {
             string nombreProducto = cmbProducto.Text.Trim();
             int cantidad = (int)nudCantidad.Value;
@@ -587,6 +587,11 @@ namespace Usuario
             // Asegura valores por defecto en los campos de totales
             txtCantidadPedido.Text = "0";
             txtTotalPagar.Text = "0.00";
+        }
+
+        private void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            LimpiarCampos();
         }
     }
 }
