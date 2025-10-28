@@ -224,10 +224,10 @@ CREATE VIEW VISTAPRODUCTOS AS
 SELECT
     IDProducto,
     Categoria,
-    -- Concatenación condicional según la categoría
+    -- ConcatenaciÃ³n condicional segÃºn la categorÃ­a
     CASE 
         WHEN Categoria IN ('Semilla', 'Semilla maquilada')
-            THEN Nombre + ' (' + CAST(CAST(ISNULL(PorcentajeGerminacion * 100, 0) AS DECIMAL(5,2)) AS VARCHAR(6)) + '% Germinación)'
+            THEN Nombre + ' (' + CAST(CAST(ISNULL(PorcentajeGerminacion * 100, 0) AS DECIMAL(5,2)) AS VARCHAR(6)) + '% GerminaciÃ³n)'
         ELSE Nombre
     END AS Producto,
     -- Solo muestra el porcentaje si es semilla o semilla maquilada, si no, NULL
@@ -248,17 +248,17 @@ SELECT
     (C.PrimerNombre + ' ' + ISNULL(C.SegundoNombre, '') + ' ' + C.PrimerApellido + ' ' + ISNULL(C.SegundoApellido, '')) AS NombreCompletoCliente,
     TT.NombreTipo AS TipoTransaccion,
     MP.NombreMetodo AS MetodoPago,
-    VP.IDVentaProducto AS IDDetalleVenta, -- Identificador único para cada línea de detalle de venta
+    VP.IDVentaProducto AS IDDetalleVenta, -- Identificador Ãºnico para cada lÃ­nea de detalle de venta
     VP.IDProducto,
-    VP_VIEW.Producto AS NombreProductoDetalle, -- Nombre del producto (incluye % de germinación para semillas)
+    VP_VIEW.Producto AS NombreProductoDetalle, -- Nombre del producto (incluye % de germinaciÃ³n para semillas)
     VP.CantidadVendida AS Cantidad,
     P.PrecioUnitario AS PrecioUnitarioVenta, -- Precio del producto en el momento de la venta
-    (VP.CantidadVendida * P.PrecioUnitario) AS SubtotalLinea, -- Subtotal por esta línea de la factura
+    (VP.CantidadVendida * P.PrecioUnitario) AS SubtotalLinea, -- Subtotal por esta lÃ­nea de la factura
     VP.Activo AS DetalleVentaActivo
 FROM
     TRANSACCION T
 INNER JOIN CLIENTE C ON T.IDCliente = C.IDCliente
-LEFT JOIN METODO_PAGO MP ON T.IDMetodoPago = MP.IDMetodoPago -- Se usa LEFT JOIN para incluir transacciones que aún no tienen un método de pago asignado.
+LEFT JOIN METODO_PAGO MP ON T.IDMetodoPago = MP.IDMetodoPago -- Se usa LEFT JOIN para incluir transacciones que aÃºn no tienen un mÃ©todo de pago asignado.
 INNER JOIN TIPO_TRANSACCION TT ON T.IDTipoTransaccion = TT.IDTipoTransaccion
 INNER JOIN VENTA_PRODUCTO VP ON T.IDTransaccion = VP.IDTransaccion
 INNER JOIN VISTAPRODUCTOS VP_VIEW ON VP.IDProducto = VP_VIEW.IDProducto
@@ -324,14 +324,14 @@ INSERT INTO PROVEEDOR (NombreProveedor, TelefonoProveedor, Activo) VALUES
 ('BioCultivos', '22556677', 1),
 ('AgroHonduras', '22667788', 1),
 ('Semillas Selectas', '22778899', 1),
-('CultivaFácil', '22889900', 1),
+('CultivaFÃ¡cil', '22889900', 1),
 ('AgroProveedores', '22990011', 1),
 ('Semillas Premium', '23001122', 1),
 ('VerdeVida', '23112233', 1);
 
 -- PRODUCTO (adaptado con PrecioMaquila obligatorio para Semilla y Semilla Maquilada)
 INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGerminacion, PrecioMaquila, IDProveedor, Activo) VALUES
-('Semilla', 'Maíz Amarillo', 100, 25.00, 0.95, 5.00, 1, 1),
+('Semilla', 'MaÃ­z Amarillo', 100, 25.00, 0.95, 5.00, 1, 1),
 ('Semilla', 'Frijol Rojo', 80, 30.00, 0.92, 6.00, 2, 1),
 ('Semilla', 'Arroz Integral', 120, 20.00, 0.90, 4.50, 3, 1),
 ('Semilla', 'Sorgo Blanco', 60, 18.00, 0.93, 4.00, 4, 1),
@@ -341,9 +341,9 @@ INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGer
 ('Semilla', 'Zanahoria', 110, 8.00, 0.89, 1.80, 8, 1),
 ('Semilla', 'Lechuga Romana', 130, 9.00, 0.91, 2.20, 9, 1),
 ('Semilla', 'Espinaca', 140, 7.00, 0.90, 1.50, 10, 1),
-('Producto', 'Fertilizante Orgánico', 50, 15.00, NULL, NULL, 1, 1),
+('Producto', 'Fertilizante OrgÃ¡nico', 50, 15.00, NULL, NULL, 1, 1),
 ('Producto', 'Insecticida Natural', 30, 10.00, NULL, NULL, 2, 1),
-('Producto', 'Fungicida Biológico', 20, 12.00, NULL, NULL, 3, 1),
+('Producto', 'Fungicida BiolÃ³gico', 20, 12.00, NULL, NULL, 3, 1),
 ('Producto', 'Herbicida Selectivo', 10, 18.00, NULL, NULL, 4, 1);
 GO
 
