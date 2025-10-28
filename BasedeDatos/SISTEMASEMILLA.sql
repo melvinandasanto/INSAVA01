@@ -346,3 +346,4 @@ INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGer
 ('Producto', 'Fungicida Biológico', 20, 12.00, NULL, NULL, 3, 1),
 ('Producto', 'Herbicida Selectivo', 10, 18.00, NULL, NULL, 4, 1);
 GO
+
