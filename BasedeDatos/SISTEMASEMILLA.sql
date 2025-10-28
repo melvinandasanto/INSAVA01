@@ -1,12 +1,20 @@
--- Script de creaci n de la base de datos y todas las tablas ordenadas por dependencias
-use master 
-go
+------------------------------------------------------------
+-- SCRIPT COMPLETO FINAL: SISTEMASEMILLA CORREGIDO
+-- Incluye usuario temporal que expira en 1 hora
+------------------------------------------------------------
+
+USE master;
+GO
+DROP DATABASE IF EXISTS SISTEMASEMILLA;
+GO
 CREATE DATABASE SISTEMASEMILLA;
 GO
 USE SISTEMASEMILLA;
 GO
 
--- 1. Cat logos b sicos
+------------------------------------------------------------
+-- 1. CATÁLOGOS BÁSICOS
+------------------------------------------------------------
 CREATE TABLE ROL (
     IDRol INT IDENTITY(1,1) PRIMARY KEY,
     NombreRol VARCHAR(50) NOT NULL UNIQUE
@@ -37,7 +45,9 @@ CREATE TABLE TIPO_ORIGEN_SEMILLA (
 );
 GO
 
--- 3. Entidades principales
+------------------------------------------------------------
+-- 2. ENTIDADES PRINCIPALES
+------------------------------------------------------------
 CREATE TABLE CLIENTE (
     IDCliente INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
     NumeroIdentidad VARCHAR(50) NOT NULL,
@@ -100,8 +110,9 @@ CREATE TABLE PRODUCTO (
 );
 GO
 
-
--- 5. Operaciones de venta y servicio
+------------------------------------------------------------
+-- 3. TABLAS DE OPERACIONES
+------------------------------------------------------------
 CREATE TABLE TRANSACCION (
     IDTransaccion INT IDENTITY(1,1) PRIMARY KEY,
     IDCliente INT NOT NULL,
@@ -153,7 +164,7 @@ GO
 CREATE TABLE MAQUILA_SEMILLA (
     IDMaquila INT IDENTITY(1,1) PRIMARY KEY,
     IDTransaccion INT NOT NULL,
-	OrigenSemilla VARCHAR(20) NOT NULL DEFAULT 'Cliente' CHECK (OrigenSemilla IN ('Cliente', 'Inventario')),
+    OrigenSemilla VARCHAR(20) NOT NULL DEFAULT 'Cliente' CHECK (OrigenSemilla IN ('Cliente', 'Inventario')),
     IDProducto INT NULL,
     CantidadMaquilada INT NOT NULL,
     PrecioPorUnidad DECIMAL(10,2) NOT NULL,
@@ -166,9 +177,9 @@ CREATE TABLE MAQUILA_SEMILLA (
 );
 GO
 
-
-
---TIGRES
+------------------------------------------------------------
+-- 4. TRIGGER MAQUILA
+------------------------------------------------------------
 CREATE TRIGGER trg_InsertMaquilaSemilla
 ON MAQUILA_SEMILLA
 INSTEAD OF INSERT
@@ -190,19 +201,19 @@ BEGIN
         CantidadMaquilada,
         PrecioPorUnidad,
         FechaInicio,
-        DATEADD(DAY, 30, FechaInicio)  -- Calcula FechaEntrega autom ticamente
+        DATEADD(DAY, 30, FechaInicio)
     FROM inserted;
 END;
 GO
 
-
-
---VISTAS PARA DATAGRIDS
+------------------------------------------------------------
+-- 5. VISTAS
+------------------------------------------------------------
 CREATE VIEW VISTAFUSUARIO AS
 SELECT 
     u.IDUsuario, 
     u.NumeroIdentidad, 
-    (u.PrimerNombre + ' ' + ISNULL(u.SegundoNombre, '') + ' ' + u.PrimerApellido + ' ' + ISNULL(u.SegundoApellido, '')) AS NombreCompleto,
+    (u.PrimerNombre + ' ' + ISNULL(u.SegundoNombre,'') + ' ' + u.PrimerApellido + ' ' + ISNULL(u.SegundoApellido,'')) AS NombreCompleto,
     u.Clave,
     r.NombreRol,
     u.Activo
@@ -210,113 +221,67 @@ FROM USUARIO u
 INNER JOIN ROL r ON u.IDRol = r.IDRol;
 GO
 
-CREATE VIEW VISTAFCLIENTE AS 
-SELECT 
-c.IDCliente,
-c.NumeroIdentidad,
-(c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre, '') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido, '')) AS NombreCompleto,
-c.NumTel as Telefono,
-c.Activo
-FROM CLIENTE c
+CREATE VIEW VISTAFCLIENTE AS
+SELECT
+    c.IDCliente,
+    c.NumeroIdentidad,
+    (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS NombreCompleto,
+    c.NumTel AS Telefono,
+    c.Activo
+FROM CLIENTE c;
 GO
 
 CREATE VIEW VISTAPRODUCTOS AS
 SELECT
     IDProducto,
     Categoria,
-    -- Concatenación condicional según la categoría
-    CASE 
-        WHEN Categoria IN ('Semilla', 'Semilla maquilada')
-            THEN Nombre + ' (' + CAST(CAST(ISNULL(PorcentajeGerminacion * 100, 0) AS DECIMAL(5,2)) AS VARCHAR(6)) + '% Germinación)'
-        ELSE Nombre
-    END AS Producto,
-    -- Solo muestra el porcentaje si es semilla o semilla maquilada, si no, NULL
-    CASE 
-        WHEN Categoria IN ('Semilla', 'Semilla maquilada') THEN CAST(ISNULL(PorcentajeGerminacion * 100, 0) AS DECIMAL(5,2))
-        ELSE NULL
-    END AS PorcentajeGerminacion,
+    CASE WHEN Categoria IN ('Semilla','Semilla Maquilada')
+         THEN Nombre + ' (' + CAST(CAST(ISNULL(PorcentajeGerminacion*100,0) AS DECIMAL(5,2)) AS VARCHAR(6)) + '% Germinación)'
+         ELSE Nombre END AS Producto,
+    CASE WHEN Categoria IN ('Semilla','Semilla Maquilada') THEN CAST(ISNULL(PorcentajeGerminacion*100,0) AS DECIMAL(5,2)) ELSE NULL END AS PorcentajeGerminacion,
     PrecioUnitario,
     PrecioMaquila
 FROM PRODUCTO
 WHERE Activo = 1;
 GO
 
-CREATE VIEW VISTAFactura AS
-SELECT
-    T.IDTransaccion AS NumeroFactura,
-    T.FechaEntrada AS FechaFactura,
-    (C.PrimerNombre + ' ' + ISNULL(C.SegundoNombre, '') + ' ' + C.PrimerApellido + ' ' + ISNULL(C.SegundoApellido, '')) AS NombreCompletoCliente,
-    TT.NombreTipo AS TipoTransaccion,
-    MP.NombreMetodo AS MetodoPago,
-    VP.IDVentaProducto AS IDDetalleVenta, -- Identificador único para cada línea de detalle de venta
-    VP.IDProducto,
-    VP_VIEW.Producto AS NombreProductoDetalle, -- Nombre del producto (incluye % de germinación para semillas)
-    VP.CantidadVendida AS Cantidad,
-    P.PrecioUnitario AS PrecioUnitarioVenta, -- Precio del producto en el momento de la venta
-    (VP.CantidadVendida * P.PrecioUnitario) AS SubtotalLinea, -- Subtotal por esta línea de la factura
-    VP.Activo AS DetalleVentaActivo
-FROM
-    TRANSACCION T
-INNER JOIN CLIENTE C ON T.IDCliente = C.IDCliente
-LEFT JOIN METODO_PAGO MP ON T.IDMetodoPago = MP.IDMetodoPago -- Se usa LEFT JOIN para incluir transacciones que aún no tienen un método de pago asignado.
-INNER JOIN TIPO_TRANSACCION TT ON T.IDTipoTransaccion = TT.IDTipoTransaccion
-INNER JOIN VENTA_PRODUCTO VP ON T.IDTransaccion = VP.IDTransaccion
-INNER JOIN VISTAPRODUCTOS VP_VIEW ON VP.IDProducto = VP_VIEW.IDProducto
-inner join PRODUCTO P ON P.IDProducto = VP_VIEW.IDProducto-- Se une con VISTAPRODUCTOS para obtener el nombre formateado del producto.
-WHERE
-    TT.NombreTipo = 'Venta de producto'; -- Se filtra para mostrar solo transacciones de venta.
-GO
-
-
---INSERCIONES FIJAS
-
+------------------------------------------------------------
+-- 6. INSERCIONES FIJAS
+------------------------------------------------------------
 INSERT INTO ROL (NombreRol) VALUES ('Administrador'), ('Empleado');
 GO
 
-
-INSERT INTO TIPO_MOVIMIENTO (NombreMovimiento) VALUES
-('Retiro'),
-('Ingreso');
+INSERT INTO TIPO_MOVIMIENTO (NombreMovimiento) VALUES ('Retiro'), ('Ingreso');
 GO
 
-INSERT INTO TIPO_ORIGEN_SEMILLA (NombreOrigen) VALUES
-('Stock'),
-('Cliente');
+INSERT INTO TIPO_ORIGEN_SEMILLA (NombreOrigen) VALUES ('Stock'), ('Cliente');
 GO
 
-INSERT INTO METODO_PAGO (NombreMetodo)
-VALUES
-  ('Contado'),
-  ('Cr dito');
+INSERT INTO METODO_PAGO (NombreMetodo) VALUES ('Contado'), ('Crédito');
 GO
 
-INSERT INTO TIPO_TRANSACCION (NombreTipo) VALUES
-('Venta de producto'),
-('Maquila');
+INSERT INTO TIPO_TRANSACCION (NombreTipo) VALUES ('Venta de producto'), ('Maquila');
 GO
 
-
---PRUEBA INSERCIONES
-
-Insert into USUARIO(NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, Clave, IDRol) 
-values ('0318200601618', 'Melvin', 'Adan', 'Santos', 'Claros', 'melvinandasanto', 1),
+INSERT INTO USUARIO (NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, Clave, IDRol)
+VALUES 
+('0318200601618', 'Melvin', 'Adan', 'Santos', 'Claros', 'melvinandasanto', 1),
 ('0000000000000', 'USUARIO', 'de','prueba','programa','12345',1);
 GO
 
--- CLIENTE
 INSERT INTO CLIENTE (NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, NumTel, Activo) VALUES
 ('0801199912345', 'Carlos', 'Eduardo', 'Martinez', 'Lopez', '98765432', 1),
 ('0801199812346', 'Ana', 'Maria', 'Gomez', 'Perez', '99887766', 1),
-('0801199712347', 'Luis', 'Fernando', 'Castro', 'Ramirez', '91234567', 1),
-('0801199612348', 'Sofia', 'Isabel', 'Hernandez', 'Mejia', '93456789', 1),
-('0801199512349', 'Jorge', 'Alberto', 'Diaz', 'Santos', '94561234', 1),
-('0801199412350', 'Paola', 'Andrea', 'Ruiz', 'Flores', '95678901', 1),
-('0801199312351', 'Miguel', 'Angel', 'Vasquez', 'Torres', '96789012', 1),
-('0801199212352', 'Gabriela', 'Lucia', 'Cruz', 'Mendoza', '97890123', 1),
-('0801199112353', 'Ricardo', 'Jose', 'Ortega', 'Suazo', '98901234', 1),
-('0801199012354', 'Valeria', 'Patricia', 'Morales', 'Aguilar', '99012345', 1);
+('0801199712347', 'Luis', 'Fernando', 'Castro', 'Ramirez', 91234567, 1),
+('0801199612348', 'Sofia', 'Isabel', 'Hernandez', 'Mejia', 93456789, 1),
+('0801199512349', 'Jorge', 'Alberto', 'Diaz', 'Santos', 94561234, 1),
+('0801199412350', 'Paola', 'Andrea', 'Ruiz', 'Flores', 95678901, 1),
+('0801199312351', 'Miguel', 'Angel', 'Vasquez', 'Torres', 96789012, 1),
+('0801199212352', 'Gabriela', 'Lucia', 'Cruz', 'Mendoza', 97890123, 1),
+('0801199112353', 'Ricardo', 'Jose', 'Ortega', 'Suazo', 98901234, 1),
+('0801199012354', 'Valeria', 'Patricia', 'Morales', 'Aguilar', 99012345, 1);
+GO
 
--- PROVEEDOR
 INSERT INTO PROVEEDOR (NombreProveedor, TelefonoProveedor, Activo) VALUES
 ('AgroSemillas S.A.', '22223333', 1),
 ('Semillas del Norte', '22334455', 1),
@@ -328,8 +293,8 @@ INSERT INTO PROVEEDOR (NombreProveedor, TelefonoProveedor, Activo) VALUES
 ('AgroProveedores', '22990011', 1),
 ('Semillas Premium', '23001122', 1),
 ('VerdeVida', '23112233', 1);
+GO
 
--- PRODUCTO (adaptado con PrecioMaquila obligatorio para Semilla y Semilla Maquilada)
 INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGerminacion, PrecioMaquila, IDProveedor, Activo) VALUES
 ('Semilla', 'Maíz Amarillo', 100, 25.00, 0.95, 5.00, 1, 1),
 ('Semilla', 'Frijol Rojo', 80, 30.00, 0.92, 6.00, 2, 1),
@@ -347,3 +312,66 @@ INSERT INTO PRODUCTO (Categoria, Nombre, Cantidad, PrecioUnitario, PorcentajeGer
 ('Producto', 'Herbicida Selectivo', 10, 18.00, NULL, NULL, 4, 1);
 GO
 
+------------------------------------------------------------
+-- 7. USUARIO TEMPORAL CON FECHA REAL
+------------------------------------------------------------
+CREATE TABLE USUARIO_TEMPORAL_CONTROL (
+    IDUsuario INT PRIMARY KEY,
+    FechaCreacion DATETIME NOT NULL DEFAULT GETDATE(),
+    FechaExpiracion DATETIME NOT NULL
+);
+GO
+
+INSERT INTO USUARIO_TEMPORAL_CONTROL (IDUsuario, FechaExpiracion)
+SELECT IDUsuario, DATEADD(HOUR,1,GETDATE())
+FROM USUARIO
+WHERE NumeroIdentidad='0000000000000';
+GO
+
+------------------------------------------------------------
+-- 8. PROCEDIMIENTOS PARA DESACTIVAR Y AUTENTICAR
+------------------------------------------------------------
+CREATE OR ALTER PROCEDURE DesactivarUsuarioTemporal
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE U
+    SET U.Activo=0
+    FROM USUARIO U
+    INNER JOIN USUARIO_TEMPORAL_CONTROL C ON U.IDUsuario=C.IDUsuario
+    WHERE U.NumeroIdentidad='0000000000000' 
+      AND U.Activo=1 
+      AND GETDATE() > C.FechaExpiracion;
+END;
+GO
+
+CREATE OR ALTER PROCEDURE AutenticarUsuario
+    @NumeroIdentidad VARCHAR(15),
+    @Clave VARCHAR(100)
+AS
+BEGIN
+    EXEC DesactivarUsuarioTemporal;
+
+    SELECT 
+        U.IDUsuario,
+        U.NumeroIdentidad,
+        U.PrimerNombre,
+        U.SegundoNombre,
+        U.PrimerApellido,
+        U.SegundoApellido,
+        U.Clave,
+        U.IDRol,
+        U.Activo,
+        C.FechaCreacion,
+        C.FechaExpiracion
+    FROM USUARIO U
+    LEFT JOIN USUARIO_TEMPORAL_CONTROL C ON U.IDUsuario=C.IDUsuario
+    WHERE U.NumeroIdentidad=@NumeroIdentidad AND U.Clave=@Clave;
+END;
+GO
+ALTER TABLE USUARIO
+ADD FechaExpiracion DATETIME NULL;
+
+UPDATE USUARIO
+SET FechaExpiracion = DATEADD(HOUR,1,GETDATE())
+WHERE NumeroIdentidad = '0000000000000';
