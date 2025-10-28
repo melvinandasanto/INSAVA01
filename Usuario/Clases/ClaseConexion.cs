@@ -21,12 +21,13 @@ namespace Usuario
         /// <summary>
         /// Inicializa una nueva instancia de ClaseConexion.
         /// </summary>
-        public ClaseConexion(string host = "DESKTOP-CE353KH", string nombreDB = "SISTEMASEMILLA")
+        public ClaseConexion(string host = "PC-JULIO", string nombreDB = "SISTEMASEMILLA")
         {
             _host = host;
             _nombreDB = nombreDB;
-            _conexion = new SqlConnection();
+            _conexion = new SqlConnection($"Server={_host};Database={_nombreDB};Integrated Security=True;Encrypt=False;");
         }
+
 
         /// <summary>
         /// Abre la conexión a la base de datos.

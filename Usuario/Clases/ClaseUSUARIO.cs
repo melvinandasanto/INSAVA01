@@ -283,14 +283,62 @@ namespace Usuario
         /// </summary>
         public bool Autenticar(string numeroIdentidad, string clave)
         {
-            var row = crud.BuscarRegistroPorCampo("NumeroIdentidad", numeroIdentidad);
-            if (row != null && row["Clave"].ToString() == clave)
-            {
-                LlenarDesdeRow(row);
-                return true;
-            }
+            var conexion = new ClaseConexion();
 
-            return false;
+            // Buscamos el usuario directamente en la base de datos (incluyendo FechaExpiracion)
+            string sql = "SELECT * FROM USUARIO WHERE NumeroIdentidad = @NumeroIdentidad";
+           
+            // With this corrected line:
+            using (SqlConnection conn = conexion._conexion)
+
+            {
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@NumeroIdentidad", numeroIdentidad);
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+
+                        if (dt.Rows.Count == 0)
+                            return false; // No existe usuario
+
+                        DataRow row = dt.Rows[0];
+
+                        // Verificar clave
+                        if (row["Clave"].ToString() != clave)
+                            return false;
+
+                        // Verificar si está activo
+                        bool activo = Convert.ToBoolean(row["Activo"]);
+                        if (!activo)
+                            return false;
+
+                        // Verificar expiración
+                        if (row["FechaExpiracion"] != DBNull.Value)
+                        {
+                            DateTime fechaExpiracion = Convert.ToDateTime(row["FechaExpiracion"]);
+                            if (DateTime.Now > fechaExpiracion)
+                            {
+                                // Usuario expirado → lo desactivamos
+                                string updateSql = "UPDATE USUARIO SET Activo = 0 WHERE NumeroIdentidad = @NumeroIdentidad";
+                                using (SqlCommand updateCmd = new SqlCommand(updateSql, conn))
+                                {
+                                    updateCmd.Parameters.AddWithValue("@NumeroIdentidad", numeroIdentidad);
+                                    updateCmd.ExecuteNonQuery();
+                                }
+
+                                MessageBox.Show("El usuario ha expirado y ha sido desactivado. Contacta al administrador.");
+                                return false;
+                            }
+                        }
+
+                        // Si todo está bien → llenar datos en la clase
+                        LlenarDesdeRow(row);
+                        return true;
+                    }
+                }
+            }
         }
     }
 }
