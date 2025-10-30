@@ -243,7 +243,259 @@ SELECT
     PrecioUnitario,
     PrecioMaquila
 FROM PRODUCTO
-WHERE Activo = 1;
+GO
+
+--VISTAS PARA REPORTERIA/BUSCADOR
+
+CREATE VIEW VISTA_CLIENTE_SIMPLE AS
+SELECT
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS NombreCompleto,
+  c.NumeroIdentidad AS Identidad,
+  c.NumTel AS Telefono
+FROM CLIENTE c;
+GO
+
+CREATE VIEW VISTA_TRANSACCION_SIMPLE AS
+SELECT
+  'T-' + RIGHT('000000' + CAST(t.IDTransaccion AS VARCHAR(10)),6) AS NumeroTransaccion,
+  CONVERT(VARCHAR(16), t.FechaEntrada, 120) AS FechaEntrada,
+  CONVERT(VARCHAR(16), t.FechaSalida, 120) AS FechaSalida,
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS NombreCliente,
+  tt.NombreTipo AS TipoTransaccion,
+  mp.NombreMetodo AS MetodoPago,
+  ISNULL(SUM(vp.TotalVenta),0) AS MontoTotal,
+  COUNT(vp.IDVentaProducto) AS Lineas
+FROM TRANSACCION t
+LEFT JOIN CLIENTE c ON t.IDCliente = c.IDCliente
+LEFT JOIN TIPO_TRANSACCION tt ON t.IDTipoTransaccion = tt.IDTipoTransaccion
+LEFT JOIN METODO_PAGO mp ON t.IDMetodoPago = mp.IDMetodoPago
+LEFT JOIN VENTA_PRODUCTO vp ON vp.IDTransaccion = t.IDTransaccion AND vp.Activo = 1
+GROUP BY
+  t.IDTransaccion, t.FechaEntrada, t.FechaSalida,
+  c.PrimerNombre, c.SegundoNombre, c.PrimerApellido, c.SegundoApellido,
+  tt.NombreTipo, mp.NombreMetodo, t.Activo;
+GO
+
+CREATE VIEW VISTA_VENTA_SIMPLE AS
+SELECT
+  p.Nombre AS NombreProducto,
+  p.Categoria,
+  vp.CantidadVendida,
+  vp.TotalVenta
+FROM VENTA_PRODUCTO vp
+LEFT JOIN PRODUCTO p ON vp.IDProducto = p.IDProducto;
+GO
+
+CREATE VIEW VISTA_MOVIMIENTO_SIMPLE AS
+SELECT
+  CONVERT(VARCHAR(19), m.FechaMovimiento, 120) AS FechaMovimiento,
+  p.Nombre AS NombreProducto,
+  tm.NombreMovimiento AS TipoMovimiento,
+  m.CantidadMovida,
+  ISNULL(m.Descripcion,'') AS Descripcion,
+  CASE WHEN m.IDTransaccion IS NOT NULL THEN 'T-' + RIGHT('000000' + CAST(m.IDTransaccion AS VARCHAR(10)),6) ELSE '' END AS TransaccionRef
+FROM MOVIMIENTO_PRODUCTO m
+LEFT JOIN PRODUCTO p ON m.IDProducto = p.IDProducto
+LEFT JOIN TIPO_MOVIMIENTO tm ON m.IDTipoMovimiento = tm.IDTipoMovimiento;
+GO
+
+CREATE VIEW VISTA_INVENTARIO_SIMPLE AS
+SELECT
+  p.Nombre AS Producto,
+  p.Categoria,
+  p.Cantidad AS StockActual,
+  p.PrecioUnitario
+FROM PRODUCTO p
+WHERE p.Activo = 1;
+GO
+
+CREATE VIEW VISTA_MAQUILA_ESTADO_DETALLE AS
+SELECT
+  'M-' + RIGHT('000000' + CAST(m.IDMaquila AS VARCHAR(10)),6) AS NumeroMaquila,
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS Cliente,
+  CASE WHEN m.OrigenSemilla IS NULL OR LTRIM(RTRIM(m.OrigenSemilla)) = '' THEN 'Cliente' ELSE m.OrigenSemilla END AS OrigenSemilla,
+  ISNULL(p.Nombre,'(Sin producto)') AS Producto,
+  m.CantidadMaquilada,
+  ROUND(m.PrecioPorUnidad,2) AS PrecioPorUnidad,
+  ROUND(m.CantidadMaquilada * m.PrecioPorUnidad,2) AS MontoMaquila,
+  CONVERT(VARCHAR(10), m.FechaInicio, 120) AS FechaInicio,
+  CONVERT(VARCHAR(10), m.FechaEntrega, 120) AS FechaEntrega,
+  DATEDIFF(DAY, CAST(GETDATE() AS DATE), m.FechaEntrega) AS DiasRestantes,
+  CASE
+    WHEN m.Activo = 0 THEN 'Desactivada manualmente'
+    WHEN CAST(GETDATE() AS DATE) < m.FechaInicio THEN 'Programada'
+    WHEN CAST(GETDATE() AS DATE) BETWEEN m.FechaInicio AND m.FechaEntrega THEN 'Activa'
+    WHEN CAST(GETDATE() AS DATE) > m.FechaEntrega THEN 'Vencida'
+    ELSE 'Desconocido'
+  END AS EstadoMaquila,
+  CASE WHEN t.IDTransaccion IS NOT NULL THEN 'T-' + RIGHT('000000' + CAST(t.IDTransaccion AS VARCHAR(10)) ,6) ELSE NULL END AS TransaccionAsociada
+FROM MAQUILA_SEMILLA m
+LEFT JOIN TRANSACCION t ON m.IDTransaccion = t.IDTransaccion
+LEFT JOIN CLIENTE c ON t.IDCliente = c.IDCliente
+LEFT JOIN PRODUCTO p ON m.IDProducto = p.IDProducto;
+GO
+
+
+-- VISTA_BUSCADOR_CLIENTES_RESUMEN
+CREATE VIEW VISTA_BUSCADOR_CLIENTES_RESUMEN AS
+SELECT
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS NombreCompleto,
+  c.NumeroIdentidad AS Identidad,
+  c.NumTel AS Telefono,
+  ISNULL(SUM(vp.TotalVenta),0) AS TotalCompras,
+  MAX(t.FechaEntrada) AS UltimaCompraFecha
+FROM CLIENTE c
+LEFT JOIN TRANSACCION t ON t.IDCliente = c.IDCliente
+LEFT JOIN VENTA_PRODUCTO vp ON vp.IDTransaccion = t.IDTransaccion AND vp.Activo = 1
+GROUP BY
+  c.PrimerNombre, c.SegundoNombre, c.PrimerApellido, c.SegundoApellido,
+  c.NumeroIdentidad, c.NumTel, c.Activo;
+GO
+
+-- VISTA_BUSCADOR_FACTURAS_RESUMEN
+CREATE VIEW VISTA_BUSCADOR_FACTURAS_RESUMEN AS
+SELECT
+  'F-' + RIGHT('000000' + CAST(t.IDTransaccion AS VARCHAR(10)),6) AS NumeroFactura,
+  t.FechaEntrada,
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS Cliente,
+  mp.NombreMetodo AS MetodoPago,
+  tt.NombreTipo AS TipoTransaccion,
+  ISNULL(SUM(vp.TotalVenta),0) AS MontoTotal,
+  COUNT(vp.IDVentaProducto) AS Lineas
+FROM TRANSACCION t
+LEFT JOIN CLIENTE c ON t.IDCliente = c.IDCliente
+LEFT JOIN METODO_PAGO mp ON t.IDMetodoPago = mp.IDMetodoPago
+LEFT JOIN TIPO_TRANSACCION tt ON t.IDTipoTransaccion = tt.IDTipoTransaccion
+LEFT JOIN VENTA_PRODUCTO vp ON vp.IDTransaccion = t.IDTransaccion AND vp.Activo = 1
+GROUP BY
+  t.IDTransaccion, t.FechaEntrada,
+  c.PrimerNombre, c.SegundoNombre, c.PrimerApellido, c.SegundoApellido,
+  mp.NombreMetodo, tt.NombreTipo, t.Activo;
+GO
+
+-- VISTA_TRANSACCIONES_DETALLE_EXPORTABLE
+CREATE VIEW VISTA_TRANSACCIONES_DETALLE_EXPORTABLE AS
+SELECT
+  'T-' + RIGHT('000000' + CAST(t.IDTransaccion AS VARCHAR(10)),6) AS NumeroTransaccion,
+  CONVERT(VARCHAR(16), t.FechaEntrada, 120) AS Fecha,
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS Cliente,
+  c.NumTel AS Telefono,
+  tt.NombreTipo AS TipoTransaccion,
+  mp.NombreMetodo AS MetodoPago,
+  ISNULL(SUM(vp.TotalVenta),0) AS MontoTotal,
+  STUFF((
+    SELECT '; ' + p2.Nombre + ' x ' + CAST(vp2.CantidadVendida AS VARCHAR(20))
+    FROM VENTA_PRODUCTO vp2
+    LEFT JOIN PRODUCTO p2 ON vp2.IDProducto = p2.IDProducto
+    WHERE vp2.IDTransaccion = t.IDTransaccion AND vp2.Activo = 1
+    FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'),1,2,'') AS ProductosResumen,
+  CASE WHEN EXISTS(SELECT 1 FROM MAQUILA_SEMILLA m WHERE m.IDTransaccion = t.IDTransaccion) THEN 'Sí' ELSE 'No' END AS TieneMaquila
+FROM TRANSACCION t
+LEFT JOIN CLIENTE c ON t.IDCliente = c.IDCliente
+LEFT JOIN TIPO_TRANSACCION tt ON t.IDTipoTransaccion = tt.IDTipoTransaccion
+LEFT JOIN METODO_PAGO mp ON t.IDMetodoPago = mp.IDMetodoPago
+LEFT JOIN VENTA_PRODUCTO vp ON vp.IDTransaccion = t.IDTransaccion AND vp.Activo = 1
+GROUP BY
+  t.IDTransaccion, t.FechaEntrada,
+  c.PrimerNombre, c.SegundoNombre, c.PrimerApellido, c.SegundoApellido,
+  c.NumTel, tt.NombreTipo, mp.NombreMetodo, t.Activo;
+GO
+
+-- VISTA_VENTAS_POR_PRODUCTO_PERIODICA
+CREATE VIEW VISTA_VENTAS_POR_PRODUCTO_PERIODICA AS
+SELECT
+  p.Nombre AS Producto,
+  p.Categoria,
+  SUM(vp.CantidadVendida) AS CantidadVendidaEnPeriodo,
+  SUM(vp.TotalVenta) AS MontoTotalEnPeriodo,
+  CASE WHEN SUM(vp.CantidadVendida) = 0 THEN 0
+       ELSE ROUND(CAST(SUM(vp.CantidadVendida) AS DECIMAL(18,4)) / NULLIF(COUNT(DISTINCT vp.IDTransaccion),0),2) END AS UnidadesPorTransaccionPromedio,
+  RANK() OVER (ORDER BY SUM(vp.CantidadVendida) DESC) AS Ranking
+FROM VENTA_PRODUCTO vp
+INNER JOIN PRODUCTO p ON vp.IDProducto = p.IDProducto
+WHERE vp.Activo = 1
+GROUP BY p.Nombre, p.Categoria;
+GO
+
+-- VISTA_MOVIMIENTOS_POR_PRODUCTO_AUDITORIA
+CREATE VIEW VISTA_MOVIMIENTOS_POR_PRODUCTO_AUDITORIA AS
+SELECT
+  CONVERT(VARCHAR(19), m.FechaMovimiento, 120) AS FechaMovimiento,
+  p.Nombre AS Producto,
+  tm.NombreMovimiento AS TipoMovimiento,
+  m.CantidadMovida,
+  ISNULL(m.Descripcion,'') AS Descripcion,
+  CASE WHEN m.IDTransaccion IS NOT NULL THEN 'T-' + RIGHT('000000' + CAST(m.IDTransaccion AS VARCHAR(10)),6) ELSE NULL END AS TransaccionRef,
+  NULL AS Usuario
+FROM MOVIMIENTO_PRODUCTO m
+LEFT JOIN PRODUCTO p ON m.IDProducto = p.IDProducto
+LEFT JOIN TIPO_MOVIMIENTO tm ON m.IDTipoMovimiento = tm.IDTipoMovimiento;
+GO
+
+-- VISTA_INVENTARIO_VALORIZADO
+CREATE VIEW VISTA_INVENTARIO_VALORIZADO AS
+SELECT
+  p.Nombre AS Producto,
+  p.Categoria,
+  p.Cantidad AS StockActual,
+  p.PrecioUnitario,
+  ROUND(p.Cantidad * p.PrecioUnitario,2) AS ValorInventario
+FROM PRODUCTO p
+GO
+
+-- VISTA_MAQUILAS_PENDIENTES_Y_HISTORICO
+CREATE VIEW VISTA_MAQUILAS_PENDIENTES_Y_HISTORICO AS
+SELECT
+  'M-' + RIGHT('000000' + CAST(m.IDMaquila AS VARCHAR(10)),6) AS NumeroMaquila,
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS Cliente,
+  m.OrigenSemilla,
+  ISNULL(p.Nombre,'(Sin producto)') AS Producto,
+  m.CantidadMaquilada,
+  m.PrecioPorUnidad,
+  ROUND(m.CantidadMaquilada * m.PrecioPorUnidad,2) AS MontoMaquila,
+  m.FechaInicio,
+  m.FechaEntrega,
+  DATEDIFF(DAY, GETDATE(), m.FechaEntrega) AS DiasRestantes,
+  CASE
+    WHEN GETDATE() <= m.FechaEntrega THEN 'En proceso'
+    WHEN GETDATE() > m.FechaEntrega THEN 'Entregada o retrasada'
+    ELSE 'Desconocido'
+  END AS Estado
+FROM MAQUILA_SEMILLA m
+LEFT JOIN TRANSACCION t ON m.IDTransaccion = t.IDTransaccion
+LEFT JOIN CLIENTE c ON t.IDCliente = c.IDCliente
+LEFT JOIN PRODUCTO p ON m.IDProducto = p.IDProducto;
+GO
+
+-- VISTA_PROVEEDORES_PRODUCTOS
+CREATE VIEW VISTA_PROVEEDORES_PRODUCTOS AS
+SELECT
+  pr.NombreProveedor AS Proveedor,
+  pr.TelefonoProveedor AS TelefonoProveedor,
+  pr.Activo AS ProveedorActivo,
+  ISNULL(
+    STUFF((
+      SELECT '; ' + p2.Nombre
+      FROM PRODUCTO p2
+      WHERE p2.IDProveedor = pr.IDProveedor
+      FOR XML PATH(''), TYPE).value('.','VARCHAR(MAX)'),1,2,''), '') AS ProductosQueSuministra,
+  ISNULL((
+    SELECT SUM(p3.Cantidad) FROM PRODUCTO p3 WHERE p3.IDProveedor = pr.IDProveedor AND p3.Activo = 1
+  ),0) AS StockTotalPorProveedor
+FROM PROVEEDOR pr;
+GO
+
+-- VISTA_CLIENTES_TOP_Y_SEGMENTACION
+CREATE VIEW VISTA_CLIENTES_TOP_Y_SEGMENTACION AS
+SELECT
+  (c.PrimerNombre + ' ' + ISNULL(c.SegundoNombre,'') + ' ' + c.PrimerApellido + ' ' + ISNULL(c.SegundoApellido,'')) AS Cliente,
+  ISNULL(SUM(vp.TotalVenta),0) AS TotalCompradoPeriodo,
+  COUNT(DISTINCT t.IDTransaccion) AS FrecuenciaCompras,
+  MAX(t.FechaEntrada) AS UltimaCompra
+FROM CLIENTE c
+LEFT JOIN TRANSACCION t ON t.IDCliente = c.IDCliente
+LEFT JOIN VENTA_PRODUCTO vp ON vp.IDTransaccion = t.IDTransaccion AND vp.Activo = 1
+GROUP BY c.PrimerNombre, c.SegundoNombre, c.PrimerApellido, c.SegundoApellido;
 GO
 
 ------------------------------------------------------------
