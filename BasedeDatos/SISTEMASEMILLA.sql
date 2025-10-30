@@ -78,8 +78,10 @@ CREATE TABLE USUARIO (
     Clave VARCHAR(100) NOT NULL,
     IDRol INT NOT NULL,
     Activo BIT NOT NULL DEFAULT 1,
+	FechaExpiracion DATETIME NULL,
     CONSTRAINT FK_Usuario_Rol FOREIGN KEY (IDRol)
-        REFERENCES ROL(IDRol) ON DELETE CASCADE
+        REFERENCES ROL(IDRol) ON DELETE CASCADE,
+		
 );
 GO
 
@@ -548,6 +550,11 @@ VALUES
 ('0000000000000', 'USUARIO', 'de','prueba','programa','12345',1);
 GO
 
+UPDATE USUARIO
+SET FechaExpiracion = DATEADD(HOUR,1,GETDATE())
+WHERE NumeroIdentidad = '0000000000000';
+GO
+
 INSERT INTO CLIENTE (NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, NumTel, Activo) VALUES
 ('0801199912345', 'Carlos', 'Eduardo', 'Martinez', 'Lopez', '98765432', 1),
 ('0801199812346', 'Ana', 'Maria', 'Gomez', 'Perez', '99887766', 1),
@@ -647,11 +654,4 @@ BEGIN
     LEFT JOIN USUARIO_TEMPORAL_CONTROL C ON U.IDUsuario=C.IDUsuario
     WHERE U.NumeroIdentidad=@NumeroIdentidad AND U.Clave=@Clave;
 END;
-GO
-ALTER TABLE USUARIO
-ADD FechaExpiracion DATETIME NULL;
-
-UPDATE USUARIO
-SET FechaExpiracion = DATEADD(HOUR,1,GETDATE())
-WHERE NumeroIdentidad = '0000000000000';
 GO
