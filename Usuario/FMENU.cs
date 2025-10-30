@@ -29,6 +29,7 @@ namespace Usuario
         private UCCLIENTE uccliente = null;
         private UCBUSCADOR ucBuscadorClientes = null;
         private Usuario.UCProducto ucproducto = null;
+        private UCMAQUILA ucmaquila = null;
 
         // Campo para guardar la referencia al perfil abierto
         private FPERFILUSUARIO perfilAbierto = null;
@@ -315,9 +316,9 @@ namespace Usuario
                 AbrirUserControlExclusivo(ref uccliente, panelContenedor);
             }
         }
-
-        private void LlamaInventario_Click(object sender, EventArgs e)
-        {
+        
+         private void LlamaInventario_Click(object sender, EventArgs e)
+         {
             if (ucproducto != null && panelContenedor.Controls.Contains(ucproducto))
             {
                 panelContenedor.Controls.Remove(ucproducto);
@@ -328,9 +329,39 @@ namespace Usuario
             {
                 AbrirUserControlExclusivo(ref ucproducto, panelContenedor);
             }
+         }
+
+        private void LlamaBuscador_Click(object sender, EventArgs e)
+        {
+            // Si el UserControl ya está abierto, lo cerramos
+            if (ucBuscadorClientes != null && panelContenedor.Controls.Contains(ucBuscadorClientes))
+            {
+                panelContenedor.Controls.Remove(ucBuscadorClientes);
+                ucBuscadorClientes.Dispose();
+                ucBuscadorClientes = null;
+            }
+            else
+            {
+                // Si no está abierto, lo abrimos
+                AbrirUserControlExclusivo<UCBUSCADOR>(ref ucBuscadorClientes, panelContenedor);
+                ucBuscadorClientes.IniciarModoClientes(); // inicializa en modo Clientes
+            }
         }
 
-      
+        private void LlamaMaquila_Click(object sender, EventArgs e)
+        {
+            if (ucmaquila != null && panelContenedor.Controls.Contains(ucmaquila))
+            {
+                panelContenedor.Controls.Remove(ucmaquila);
+                ucmaquila.Dispose();
+                ucmaquila = null;
+            }
+            else
+            {
+                AbrirUserControlExclusivo(ref ucmaquila, panelContenedor);
+            }
+        }
+
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e)
         {
@@ -358,30 +389,6 @@ namespace Usuario
                     DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
             }
         }
-
-        private void btnFacturas_Click(object sender, EventArgs e)
-        {
-            var formBuscarFacturas = new FBuscarFactura();
-            formBuscarFacturas.ShowDialog();
-        }
-
-        private void LlamaBuscador_Click(object sender, EventArgs e)
-        {
-            // Si el UserControl ya está abierto, lo cerramos
-            if (ucBuscadorClientes != null && panelContenedor.Controls.Contains(ucBuscadorClientes))
-            {
-                panelContenedor.Controls.Remove(ucBuscadorClientes);
-                ucBuscadorClientes.Dispose();
-                ucBuscadorClientes = null;
-            }
-            else
-            {
-                // Si no está abierto, lo abrimos
-                AbrirUserControlExclusivo<UCBUSCADOR>(ref ucBuscadorClientes, panelContenedor);
-                ucBuscadorClientes.IniciarModoClientes(); // inicializa en modo Clientes
-            }
-        }
-
-
+        
     }
 }

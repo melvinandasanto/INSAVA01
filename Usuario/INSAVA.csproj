@@ -92,18 +92,6 @@
     <Compile Include="FACTURA.Designer.cs">
       <DependentUpon>FACTURA.cs</DependentUpon>
     </Compile>
-    <Compile Include="FBuscarClientes.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FBuscarClientes.Designer.cs">
-      <DependentUpon>FBuscarClientes.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FBuscarFactura.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FBuscarFactura.Designer.cs">
-      <DependentUpon>FBuscarFactura.cs</DependentUpon>
-    </Compile>
     <Compile Include="UCBUSCADOR.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -159,6 +147,12 @@
     <Compile Include="FOLVIDOCONTRA.Designer.cs">
       <DependentUpon>FOLVIDOCONTRA.cs</DependentUpon>
     </Compile>
+    <Compile Include="UCMAQUILA.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UCMAQUILA.Designer.cs">
+      <DependentUpon>UCMAQUILA.cs</DependentUpon>
+    </Compile>
     <Compile Include="UCUSUARIO.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -173,12 +167,6 @@
     </Compile>
     <EmbeddedResource Include="FACTURA.resx">
       <DependentUpon>FACTURA.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FBuscarClientes.resx">
-      <DependentUpon>FBuscarClientes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FBuscarFactura.resx">
-      <DependentUpon>FBuscarFactura.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UCBUSCADOR.resx">
       <DependentUpon>UCBUSCADOR.cs</DependentUpon>

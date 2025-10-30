@@ -38,11 +38,11 @@
             this.LlamaInventario = new System.Windows.Forms.ToolStripButton();
             this.LlamaUsuario = new System.Windows.Forms.ToolStripButton();
             this.LlamaBuscador = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.btnClientes = new System.Windows.Forms.ToolStripButton();
             this.btnFacturas = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.panelContenedor.SuspendLayout();
             this.toolStrip2.SuspendLayout();
@@ -67,7 +67,7 @@
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.toolStrip1.Size = new System.Drawing.Size(1482, 50);
+            this.toolStrip1.Size = new System.Drawing.Size(1482, 47);
             this.toolStrip1.TabIndex = 15;
             this.toolStrip1.Text = "toolStrip1";
             this.toolStrip1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.toolStrip1_MouseDown);
@@ -78,7 +78,7 @@
             this.LlamaVentas.Image = ((System.Drawing.Image)(resources.GetObject("LlamaVentas.Image")));
             this.LlamaVentas.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
             this.LlamaVentas.Name = "LlamaVentas";
-            this.LlamaVentas.Size = new System.Drawing.Size(160, 44);
+            this.LlamaVentas.Size = new System.Drawing.Size(160, 41);
             this.LlamaVentas.Text = "Ventas";
             this.LlamaVentas.Click += new System.EventHandler(this.LlamaVentas_Click);
             // 
@@ -153,14 +153,23 @@
             this.LlamaBuscador.Text = "Buscador";
             this.LlamaBuscador.Click += new System.EventHandler(this.LlamaBuscador_Click);
             // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(175, 41);
+            this.toolStripButton1.Text = "Maquila";
+            this.toolStripButton1.Click += new System.EventHandler(this.LlamaMaquila_Click);
+            // 
             // panelContenedor
             // 
             this.panelContenedor.Controls.Add(this.toolStrip2);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelContenedor.Location = new System.Drawing.Point(0, 50);
-            this.panelContenedor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panelContenedor.Location = new System.Drawing.Point(0, 47);
+            this.panelContenedor.Margin = new System.Windows.Forms.Padding(4);
             this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(1482, 738);
+            this.panelContenedor.Size = new System.Drawing.Size(1482, 741);
             this.panelContenedor.TabIndex = 18;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
             // 
@@ -191,20 +200,8 @@
             // 
             // btnFacturas
             // 
-            this.btnFacturas.Image = ((System.Drawing.Image)(resources.GetObject("btnFacturas.Image")));
-            this.btnFacturas.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnFacturas.Name = "btnFacturas";
-            this.btnFacturas.Size = new System.Drawing.Size(190, 69);
-            this.btnFacturas.Text = "Facturas";
-            this.btnFacturas.Click += new System.EventHandler(this.btnFacturas_Click);
-            // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(175, 44);
-            this.toolStripButton1.Text = "Maquila";
+            this.btnFacturas.Size = new System.Drawing.Size(46, 69);
             // 
             // FMENU
             // 
