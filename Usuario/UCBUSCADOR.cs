@@ -74,22 +74,39 @@ namespace Usuario
 
             DataTable dt = new DataTable();
             SqlParameter param = new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" };
+            string estadoFiltro = cboFiltroActivo.SelectedItem?.ToString() ?? "Activos";
 
             if (CBOperacion.SelectedItem.ToString() == "Clientes")
             {
-                string query = "SELECT * FROM VISTAFCLIENTE WHERE NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda";
-                dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                string query = "SELECT * FROM VISTAFCLIENTE WHERE (NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda)";
+                if (estadoFiltro != "Todos")
+                {
+                    query += " AND Activo = @activo";
+                    var paramActivo = new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" };
+                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param, paramActivo });
+                }
+                else
+                {
+                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                }
             }
             else if (CBOperacion.SelectedItem.ToString() == "Facturas")
             {
-                string query = "SELECT * FROM VISTAFACTURA WHERE NombreCompletoCliente LIKE @busqueda OR NumeroFactura LIKE @busqueda";
-                dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                string query = "SELECT * FROM VISTAFACTURA WHERE (NombreCompletoCliente LIKE @busqueda OR NumeroFactura LIKE @busqueda)";
+                if (estadoFiltro != "Todos")
+                {
+                    query += " AND Activo = @activo";
+                    var paramActivo = new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" };
+                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param, paramActivo });
+                }
+                else
+                {
+                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                }
             }
 
             dgvcliente.DataSource = dt;
         }
-
-
 
 
         private void btnLimpiarcli_Click(object sender, EventArgs e)
@@ -117,10 +134,6 @@ namespace Usuario
                 cmbclientes.Items.Add("Escribe número de factura o cliente"); // guía temporal
             }
         }
-
-
-
-
 
         private void BuscarClientePorID(string idCliente)
         {
@@ -203,6 +216,25 @@ namespace Usuario
             dgvcliente.DataSource = null;    // limpia el DataGridView
         }
 
+
+
+        private void cboFiltroActivo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Si hay texto en el buscador, ejecutar la búsqueda con el nuevo filtro
+            if (!string.IsNullOrEmpty(cmbclientes.Text.Trim()))
+            {
+                BtnBuscarcli_Click(sender, e);
+            }
+        }
+
+        private void CargarFiltro()
+        {
+            cboFiltroActivo.Items.Clear();
+            cboFiltroActivo.Items.Add("Activos");
+            cboFiltroActivo.Items.Add("Inactivos");
+            cboFiltroActivo.Items.Add("Todos");
+            cboFiltroActivo.SelectedIndex = 0;
+        }
 
     }
 }

@@ -245,6 +245,32 @@ SELECT
 FROM PRODUCTO
 GO
 
+CREATE VIEW VISTAFactura AS
+SELECT
+    T.IDTransaccion AS NumeroFactura,
+    T.FechaEntrada AS FechaFactura,
+    (C.PrimerNombre + ' ' + ISNULL(C.SegundoNombre, '') + ' ' + C.PrimerApellido + ' ' + ISNULL(C.SegundoApellido, '')) AS NombreCompletoCliente,
+    TT.NombreTipo AS TipoTransaccion,
+    MP.NombreMetodo AS MetodoPago,
+    VP.IDVentaProducto AS IDDetalleVenta, -- Identificador único para cada línea de detalle de venta
+    VP.IDProducto,
+    VP_VIEW.Producto AS NombreProductoDetalle, -- Nombre del producto (incluye % de germinación para semillas)
+    VP.CantidadVendida AS Cantidad,
+    P.PrecioUnitario AS PrecioUnitarioVenta, -- Precio del producto en el momento de la venta
+    (VP.CantidadVendida * P.PrecioUnitario) AS SubtotalLinea, -- Subtotal por esta línea de la factura
+    VP.Activo AS DetalleVentaActivo
+FROM
+    TRANSACCION T
+INNER JOIN CLIENTE C ON T.IDCliente = C.IDCliente
+LEFT JOIN METODO_PAGO MP ON T.IDMetodoPago = MP.IDMetodoPago -- Se usa LEFT JOIN para incluir transacciones que aún no tienen un método de pago asignado.
+INNER JOIN TIPO_TRANSACCION TT ON T.IDTipoTransaccion = TT.IDTipoTransaccion
+INNER JOIN VENTA_PRODUCTO VP ON T.IDTransaccion = VP.IDTransaccion
+INNER JOIN VISTAPRODUCTOS VP_VIEW ON VP.IDProducto = VP_VIEW.IDProducto
+inner join PRODUCTO P ON P.IDProducto = VP_VIEW.IDProducto-- Se une con VISTAPRODUCTOS para obtener el nombre formateado del producto.
+WHERE
+    TT.NombreTipo = 'Venta de producto'; -- Se filtra para mostrar solo transacciones de venta.
+GO
+
 --VISTAS PARA REPORTERIA/BUSCADOR
 
 CREATE VIEW VISTA_CLIENTE_SIMPLE AS
