@@ -160,10 +160,10 @@
             // 
             // cboFiltroActivo
             // 
-            this.cboFiltroActivo.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.cboFiltroActivo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cboFiltroActivo.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cboFiltroActivo.FormattingEnabled = true;
-            this.cboFiltroActivo.Location = new System.Drawing.Point(1116, 242);
+            this.cboFiltroActivo.Location = new System.Drawing.Point(1133, 187);
             this.cboFiltroActivo.Margin = new System.Windows.Forms.Padding(4);
             this.cboFiltroActivo.Name = "cboFiltroActivo";
             this.cboFiltroActivo.Size = new System.Drawing.Size(400, 39);

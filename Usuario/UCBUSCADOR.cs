@@ -16,6 +16,10 @@ namespace Usuario
             InitializeComponent();
             _conexionDB = new ClaseConexion();
             DiseñoGlobal.RegistrarUserControl(this);
+            
+            // Configurar el combo de filtro
+            cboFiltroActivo.DropDownStyle = ComboBoxStyle.DropDownList; // Forzar selección de lista
+            CargarFiltro(); // Cargar las opciones inicialmente
         }
 
         private void UCBUSCADOR_Load(object sender, EventArgs e)
@@ -25,6 +29,12 @@ namespace Usuario
             CBOperacion.Items.Add("Facturas");
             CBOperacion.SelectedIndex = 0; // Selecciona Clientes por defecto
 
+            // Asegurar que el filtro esté inicializado
+            if (cboFiltroActivo.Items.Count == 0)
+            {
+                CargarFiltro();
+            }
+            
             // Texto inicial en el ComboBox de búsqueda
             cmbclientes.Text = "Escriba el nombre o ID del cliente...";
         }
@@ -65,47 +75,83 @@ namespace Usuario
 
         private void BtnBuscarcli_Click(object sender, EventArgs e)
         {
-            string searchTerm = cmbclientes.Text.Trim();
-            if (string.IsNullOrEmpty(searchTerm))
+            string searchTerm = cmbclientes.Text?.Trim() ?? "";
+            // Si el texto es guía, considerarlo como búsqueda vacía
+            if (searchTerm == "Escriba el nombre o ID del cliente..." ||
+                searchTerm == "Escribe el nombre o ID del cliente" ||
+                searchTerm == "Escribe número de factura o cliente")
             {
-                dgvcliente.DataSource = null;
-                return;
+                searchTerm = "";
             }
 
             DataTable dt = new DataTable();
-            SqlParameter param = new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" };
+            List<SqlParameter> parametros = new List<SqlParameter>();
             string estadoFiltro = cboFiltroActivo.SelectedItem?.ToString() ?? "Activos";
+            string query;
 
             if (CBOperacion.SelectedItem.ToString() == "Clientes")
             {
-                string query = "SELECT * FROM VISTAFCLIENTE WHERE (NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda)";
+                query = "SELECT * FROM VISTAFCLIENTE";
+                
+                // Construir WHERE según búsqueda y filtro
+                List<string> condiciones = new List<string>();
+                
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    condiciones.Add("(NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda)");
+                    parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                }
+
                 if (estadoFiltro != "Todos")
                 {
-                    query += " AND Activo = @activo";
-                    var paramActivo = new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" };
-                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param, paramActivo });
+                    condiciones.Add("Activo = @activo");
+                    parametros.Add(new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" });
                 }
-                else
+
+                if (condiciones.Count > 0)
                 {
-                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                    query += " WHERE " + string.Join(" AND ", condiciones);
                 }
             }
             else if (CBOperacion.SelectedItem.ToString() == "Facturas")
             {
-                string query = "SELECT * FROM VISTAFACTURA WHERE (NombreCompletoCliente LIKE @busqueda OR NumeroFactura LIKE @busqueda)";
+                query = "SELECT * FROM VISTAFACTURA";
+                
+                // Construir WHERE según búsqueda y filtro
+                List<string> condiciones = new List<string>();
+                
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    condiciones.Add("(NombreCompletoCliente LIKE @busqueda OR NumeroFactura LIKE @busqueda)");
+                    parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                }
+
                 if (estadoFiltro != "Todos")
                 {
-                    query += " AND Activo = @activo";
-                    var paramActivo = new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" };
-                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param, paramActivo });
+                    condiciones.Add("Activo = @activo");
+                    parametros.Add(new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" });
                 }
-                else
+
+                if (condiciones.Count > 0)
                 {
-                    dt = _conexionDB.Tabla(query, new SqlParameter[] { param });
+                    query += " WHERE " + string.Join(" AND ", condiciones);
                 }
             }
+            else
+            {
+                MessageBox.Show("Seleccione una operación válida");
+                return;
+            }
 
-            dgvcliente.DataSource = dt;
+            try
+            {
+                dt = _conexionDB.Tabla(query, parametros.ToArray());
+                dgvcliente.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al realizar la búsqueda: {ex.Message}");
+            }
         }
 
 
