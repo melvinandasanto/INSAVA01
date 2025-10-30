@@ -33,9 +33,34 @@ namespace Usuario
         // Campo para guardar la referencia al perfil abierto
         private FPERFILUSUARIO perfilAbierto = null;
 
+        // Nueva instancia de ClaseMaquila
+        private ClaseMaquila maquila;
+
         public FMENU()
         {
             InitializeComponent();
+            maquila = new ClaseMaquila();
+            
+            // Verificar maquilas vencidas al inicio
+            ActualizarEstadosMaquila();
+
+            // Programar verificación periódica
+            Timer timerVerificacion = new Timer();
+            timerVerificacion.Interval = 24 * 60 * 60 * 1000; // 24 horas
+            timerVerificacion.Tick += (s, e) => ActualizarEstadosMaquila();
+            timerVerificacion.Start();
+        }
+
+        private void ActualizarEstadosMaquila()
+        {
+            try
+            {
+                maquila.ActualizarEstadosMaquila();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar estados de maquila: {ex.Message}");
+            }
         }
 
         private void FMENU_Load(object sender, EventArgs e)

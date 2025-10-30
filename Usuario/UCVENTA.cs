@@ -456,13 +456,32 @@ namespace Usuario
             }
 
             DataTable detalle = ObtenerDetallePedidos();
-
             string cliente = "CONSUMIDOR FINAL";
             int numeroOrden = ObtenerNumeroOrden();
 
-            FACTURA frmFactura = new FACTURA(numeroOrden, cliente, detalle); // <-- ahora sin usuario
+            FACTURA frmFactura = new FACTURA(numeroOrden, cliente, detalle);
             if (frmFactura.ShowDialog() == DialogResult.OK)
             {
+                // Registrar maquilas si existen
+                var maquila = new ClaseMaquila();
+                foreach (DataGridViewRow row in dgvPedido.Rows)
+                {
+                    if (row.Cells["Producto"].Value?.ToString().StartsWith("Maquila ") == true)
+                    {
+                        int? idProducto = row.Cells["IDProducto"].Value as int?;
+                        int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
+                        decimal precio = Convert.ToDecimal(row.Cells["PrecioUnitario"].Value);
+                        
+                        maquila.RegistrarMaquila(
+                            numeroOrden,
+                            idProducto.HasValue ? "Inventario" : "Cliente",
+                            idProducto,
+                            cantidad,
+                            precio
+                        );
+                    }
+                }
+
                 LimpiarPedidos();
                 ActualizarTotales();
             }

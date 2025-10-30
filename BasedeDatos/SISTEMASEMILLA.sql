@@ -170,6 +170,7 @@ CREATE TABLE MAQUILA_SEMILLA (
     PrecioPorUnidad DECIMAL(10,2) NOT NULL,
     FechaInicio DATE NOT NULL,
     FechaEntrega DATE NOT NULL,
+     Activo BIT NOT NULL DEFAULT 1,
     CONSTRAINT FK_Maquila_Trans FOREIGN KEY (IDTransaccion)
         REFERENCES TRANSACCION(IDTransaccion),
     CONSTRAINT FK_Maquila_Prod FOREIGN KEY (IDProducto)
@@ -375,3 +376,4 @@ ADD FechaExpiracion DATETIME NULL;
 UPDATE USUARIO
 SET FechaExpiracion = DATEADD(HOUR,1,GETDATE())
 WHERE NumeroIdentidad = '0000000000000';
+GO

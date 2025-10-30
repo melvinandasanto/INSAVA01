@@ -74,6 +74,7 @@
     <Compile Include="Clases\ClaseCRUD1.cs" />
     <Compile Include="Clases\ClaseFiltroActivo.cs" />
     <Compile Include="Clases\ClaseGrid.cs" />
+    <Compile Include="Clases\ClaseMaquila.cs" />
     <Compile Include="Clases\ClasePin.cs" />
     <Compile Include="Clases\ClasePRODUCTO.cs" />
     <Compile Include="Clases\ClasePROVEEDOR.cs" />
