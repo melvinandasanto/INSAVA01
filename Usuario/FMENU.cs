@@ -29,7 +29,6 @@ namespace Usuario
         private UCCLIENTE uccliente = null;
         private UCBUSCADOR ucBuscadorClientes = null;
         private Usuario.UCProducto ucproducto = null;
-        private UCMAQUILA ucmaquila = null;
 
         // Campo para guardar la referencia al perfil abierto
         private FPERFILUSUARIO perfilAbierto = null;
@@ -348,19 +347,6 @@ namespace Usuario
             }
         }
 
-        private void LlamaMaquila_Click(object sender, EventArgs e)
-        {
-            if (ucmaquila != null && panelContenedor.Controls.Contains(ucmaquila))
-            {
-                panelContenedor.Controls.Remove(ucmaquila);
-                ucmaquila.Dispose();
-                ucmaquila = null;
-            }
-            else
-            {
-                AbrirUserControlExclusivo(ref ucmaquila, panelContenedor);
-            }
-        }
 
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e)

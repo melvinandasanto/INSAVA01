@@ -38,7 +38,6 @@
             this.LlamaInventario = new System.Windows.Forms.ToolStripButton();
             this.LlamaUsuario = new System.Windows.Forms.ToolStripButton();
             this.LlamaBuscador = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.panelContenedor = new System.Windows.Forms.Panel();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.btnClientes = new System.Windows.Forms.ToolStripButton();
@@ -61,8 +60,7 @@
             this.LlamaClientes,
             this.LlamaInventario,
             this.LlamaUsuario,
-            this.LlamaBuscador,
-            this.toolStripButton1});
+            this.LlamaBuscador});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
@@ -153,15 +151,6 @@
             this.LlamaBuscador.Text = "Buscador";
             this.LlamaBuscador.Click += new System.EventHandler(this.LlamaBuscador_Click);
             // 
-            // toolStripButton1
-            // 
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(175, 41);
-            this.toolStripButton1.Text = "Maquila";
-            this.toolStripButton1.Click += new System.EventHandler(this.LlamaMaquila_Click);
-            // 
             // panelContenedor
             // 
             this.panelContenedor.Controls.Add(this.toolStrip2);
@@ -247,6 +236,5 @@
         private System.Windows.Forms.ToolStripButton btnClientes;
         private System.Windows.Forms.ToolStripButton btnFacturas;
         private System.Windows.Forms.ToolStripButton LlamaBuscador;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }

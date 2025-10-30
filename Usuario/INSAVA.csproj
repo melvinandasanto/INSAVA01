@@ -147,12 +147,6 @@
     <Compile Include="FOLVIDOCONTRA.Designer.cs">
       <DependentUpon>FOLVIDOCONTRA.cs</DependentUpon>
     </Compile>
-    <Compile Include="UCMAQUILA.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UCMAQUILA.Designer.cs">
-      <DependentUpon>UCMAQUILA.cs</DependentUpon>
-    </Compile>
     <Compile Include="UCUSUARIO.cs">
       <SubType>UserControl</SubType>
     </Compile>

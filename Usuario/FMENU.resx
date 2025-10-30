@@ -233,28 +233,9 @@
         TSzZyYdm9l+gvXr1UnNzfwFh1y+kJI0v1QAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="toolStripButton1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAAHYcAAB2HAY/l8WUAAAOaSURBVGhD7dhZqJRlHMfxk5paQS6I2qqiuCCauFBZQnRR
-        SgQlKCqIigpeSolhkKFoeqG0QNBVghHZQiJo60VJoUZKCqmoJaQUYbZYtFFq36/Mn/4MM3M858w4Mzg/
-        +HBmnnnP8z7v9ixvWyuttHL1Zljhb9PlGjyPC9iOoWiqrMPF5Gc8iqaIDfXM5wOQZWvR0BmJc4hGH8J3
-        6bueRkOmG/YhGnoKg9EXHxbK5JV4GA2XJYhGnsd9iPSED3P8/gP6oGHSA98gGvgCinMDjiO28UFvmMxD
-        NOwsbkSpPITYzp7JK9MQeRfRsKcsKBPHh6OIbaej7rkef8IGee/fikrZiDiA5yyod3xYo0F2m+1lJmL7
-        9y2od+YjGvSyBYUsxf24/dK3/zMRsf0BC+qdlYgGbbCA9EeU/WRByljEb3stqHfyATxrARmOKDthQcoD
-        iN92YABmwHHEulZgIeyxxsMBsqZZhGjQaxaQOxBlX1iQshzx21/pczm/YBcew02oeiYjdhZn+x5E2acW
-        FGI3mqcbHfUPduJBVC1e4tOInYzD3em7DTYubj5ClIczeAd2qXaxeglv4yuUmtlqD+wkqpLNiIrfgPdu
-        fD+MafgxlelNTIVXpVL6YS7c/m/kOrQNN6NLGYI/YIWesVWFz3J6/Wv67tXyQe5MfAa8QjFwBqcvXV4w
-        uViJCv9Nn7OTqMY62Tq8IrluT9x6tHdFy8aJ2SfIlWa/wzGgvfTGGEyCHYTP1CCUyiNwnMn78fnpdAbi
-        GHKFwf69VLwtluF1ONErd/XuQqnkcUjl9nPZ8SA+R67Us+SZzbGnegvlGpw5XvRCce5Efh7s5aoy8NlY
-        X6tE47Yg4tzIsx07LWZf75XYj934Ek7XizMa3yP+71vcgqpmAuzPXfAYZ6IuZHKDdRCPw3u++EqVis9H
-        flnwG5wk1jRrkBvt2mErHDM6kgWwQ4h67KLvRc1it+YaOTfeW2QKOpJRcMTO9fhyoNzDXbWsRt6pvK2c
-        bbrQr5Tr4LLTh90rlutwKn4baprZKDeXkVMD73+nAy/CUdZpySv4GDG6Z/Y6vtGo+QsBz45T4djxB3AJ
-        WemAKvH/XkXxCq8m8b5/D7Hzr+EbOuNi50k4myye05TiZPAZjMAVyyxEA7xN7B5L5VrYJToRWwxH1Sfg
-        yOyEr8uzzM6kO44gDmATmipzEI33GXDN21TxtvAW+gze600dX/q20korrVzVaWv7D2myilPby31qAAAA
-        AElFTkSuQmCC
-</value>
-  </data>
+  <metadata name="toolStrip2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>378, 20</value>
+  </metadata>
   <metadata name="toolStrip2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>378, 20</value>
   </metadata>
