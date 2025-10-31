@@ -16,28 +16,33 @@ namespace Usuario
             InitializeComponent();
             _conexionDB = new ClaseConexion();
             DiseñoGlobal.RegistrarUserControl(this);
-            
-            // Configurar el combo de filtro
-            cboFiltroActivo.DropDownStyle = ComboBoxStyle.DropDownList; // Forzar selección de lista
-            CargarFiltro(); // Cargar las opciones inicialmente
+            cboFiltroActivo.DropDownStyle = ComboBoxStyle.DropDownList;
+            CargarFiltro();
+
+            // Cargar directamente las opciones del combo
+            CBOperacion.Items.AddRange(new object[] { "Clientes", "Facturas", "Inventario", "Maquilas", "Movimientos" });
+            CBOperacion.SelectedIndex = 0;
         }
+
 
         private void UCBUSCADOR_Load(object sender, EventArgs e)
         {
             CBOperacion.Items.Clear();
+
             CBOperacion.Items.Add("Clientes");
             CBOperacion.Items.Add("Facturas");
-            CBOperacion.SelectedIndex = 0; // Selecciona Clientes por defecto
+            CBOperacion.Items.Add("Inventario");
+            CBOperacion.Items.Add("Maquilas");
+            CBOperacion.Items.Add("Movimientos");
 
-            // Asegurar que el filtro esté inicializado
-            if (cboFiltroActivo.Items.Count == 0)
+            if (CBOperacion.Items.Count > 0)
             {
-                CargarFiltro();
+                CBOperacion.SelectedIndex = 0;
             }
-            
-            // Texto inicial en el ComboBox de búsqueda
-            cmbclientes.Text = "Escriba el nombre o ID del cliente...";
+
+            CBOperacion_SelectedIndexChanged(null, null);
         }
+
 
 
         private void CargarClientesCombo()
@@ -75,76 +80,106 @@ namespace Usuario
 
         private void BtnBuscarcli_Click(object sender, EventArgs e)
         {
+            if (CBOperacion.SelectedItem == null) return;
+            if (cboFiltroActivo.SelectedItem == null) cboFiltroActivo.SelectedIndex = 2; // asegurar 'Todos' si es nulo
+
             string searchTerm = cmbclientes.Text?.Trim() ?? "";
-            // Si el texto es guía, considerarlo como búsqueda vacía
-            if (searchTerm == "Escriba el nombre o ID del cliente..." ||
-                searchTerm == "Escribe el nombre o ID del cliente" ||
-                searchTerm == "Escribe número de factura o cliente")
-            {
+            if (searchTerm.StartsWith("Escribe") || searchTerm.StartsWith("Buscar") || searchTerm.StartsWith("Reporte"))
                 searchTerm = "";
-            }
 
             DataTable dt = new DataTable();
             List<SqlParameter> parametros = new List<SqlParameter>();
-            string estadoFiltro = cboFiltroActivo.SelectedItem?.ToString() ?? "Activos";
-            string query;
-
-            if (CBOperacion.SelectedItem.ToString() == "Clientes")
-            {
-                query = "SELECT * FROM VISTAFCLIENTE";
-                
-                // Construir WHERE según búsqueda y filtro
-                List<string> condiciones = new List<string>();
-                
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    condiciones.Add("(NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda)");
-                    parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
-                }
-
-                if (estadoFiltro != "Todos")
-                {
-                    condiciones.Add("Activo = @activo");
-                    parametros.Add(new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" });
-                }
-
-                if (condiciones.Count > 0)
-                {
-                    query += " WHERE " + string.Join(" AND ", condiciones);
-                }
-            }
-            else if (CBOperacion.SelectedItem.ToString() == "Facturas")
-            {
-                query = "SELECT * FROM VISTAFACTURA";
-                
-                // Construir WHERE según búsqueda y filtro
-                List<string> condiciones = new List<string>();
-                
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    condiciones.Add("(NombreCompletoCliente LIKE @busqueda OR NumeroFactura LIKE @busqueda)");
-                    parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
-                }
-
-                if (estadoFiltro != "Todos")
-                {
-                    condiciones.Add("Activo = @activo");
-                    parametros.Add(new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" });
-                }
-
-                if (condiciones.Count > 0)
-                {
-                    query += " WHERE " + string.Join(" AND ", condiciones);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Seleccione una operación válida");
-                return;
-            }
+            string estadoFiltro = cboFiltroActivo.SelectedItem.ToString();
+            string query = "";
 
             try
             {
+                string operacion = CBOperacion.SelectedItem.ToString();
+
+                if (operacion == "Clientes")
+                {
+                    // Usamos la vista VISTAFCLIENTE (que en tu script sí contiene IDCliente, NombreCompleto, NumeroIdentidad, Telefono, Activo)
+                    query = "SELECT IDCliente, NumeroIdentidad AS Identidad, NombreCompleto, Telefono, Activo FROM VISTAFCLIENTE";
+
+                    List<string> condiciones = new List<string>();
+
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        condiciones.Add("(NombreCompleto LIKE @busqueda OR NumeroIdentidad LIKE @busqueda OR Telefono LIKE @busqueda)");
+                        parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                    }
+
+                    if (estadoFiltro != "Todos")
+                    {
+                        // En VISTAFCLIENTE la columna se llama Activo (bit)
+                        condiciones.Add("Activo = @activo");
+                        parametros.Add(new SqlParameter("@activo", SqlDbType.Bit) { Value = estadoFiltro == "Activos" });
+                    }
+
+                    if (condiciones.Count > 0)
+                        query += " WHERE " + string.Join(" AND ", condiciones);
+                }
+                else if (operacion == "Facturas")
+                {
+                    query = "SELECT NumeroFactura, FechaEntrada, Cliente, MontoTotal, TipoTransaccion, MetodoPago FROM VISTA_BUSCADOR_FACTURAS_RESUMEN";
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        query += " WHERE Cliente LIKE @busqueda OR NumeroFactura LIKE @busqueda";
+                        parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                    }
+                }
+                else if (operacion == "Inventario")
+                {
+                    query = "SELECT Producto, Categoria, StockActual, PrecioUnitario, ValorInventario FROM VISTA_INVENTARIO_VALORIZADO";
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        query += " WHERE Producto LIKE @busqueda OR Categoria LIKE @busqueda";
+                        parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                    }
+                }
+                else if (operacion == "Maquilas")
+                {
+                    // Usa la vista que sí existe y tiene la columna EstadoMaquila
+                    query = "SELECT NumeroMaquila, Cliente, OrigenSemilla, Producto, CantidadMaquilada, MontoMaquila, FechaEntrega, EstadoMaquila FROM VISTA_MAQUILA_ESTADO_DETALLE";
+                    List<string> condiciones = new List<string>();
+
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        condiciones.Add("(NumeroMaquila LIKE @busqueda OR Cliente LIKE @busqueda OR Producto LIKE @busqueda)");
+                        parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                    }
+
+                    if (estadoFiltro != "Todos")
+                    {
+                        // 🔹 Mapeo del filtro
+                        // "Activos" → EstadoMaquila = 'Activa'
+                        // "Inactivos" → EstadoMaquila = 'Desactivada manualmente'
+                        string estadoBuscado = estadoFiltro == "Activos" ? "Activa" : "Desactivada manualmente";
+                        condiciones.Add("EstadoMaquila = @estado");
+                        parametros.Add(new SqlParameter("@estado", SqlDbType.NVarChar) { Value = estadoBuscado });
+                    }
+
+                    if (condiciones.Count > 0)
+                        query += " WHERE " + string.Join(" AND ", condiciones);
+                }
+                else if (operacion == "Movimientos")
+                {
+                    query = "SELECT FechaMovimiento, Producto, TipoMovimiento, CantidadMovida, Descripcion, TransaccionRef FROM VISTA_MOVIMIENTOS_POR_PRODUCTO_AUDITORIA";
+                    if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        query += " WHERE Producto LIKE @busqueda OR TipoMovimiento LIKE @busqueda OR Descripcion LIKE @busqueda";
+                        parametros.Add(new SqlParameter("@busqueda", SqlDbType.NVarChar) { Value = "%" + searchTerm + "%" });
+                    }
+
+                    // Nota: la vista de movimientos en tu script no expone un campo 'Estado'. Si quieres filtrar por Activo,
+                    // deberías modificar la vista VISTA_MOVIMIENTOS_POR_PRODUCTO_AUDITORIA para incluir m.Activo o similar.
+                }
+                else
+                {
+                    MessageBox.Show("Seleccione una operación válida o configure su búsqueda.");
+                    return;
+                }
+
                 dt = _conexionDB.Tabla(query, parametros.ToArray());
                 dgvcliente.DataSource = dt;
             }
@@ -164,22 +199,52 @@ namespace Usuario
 
         private void CBOperacion_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Limpia la búsqueda y el DataGridView al cambiar la opción
-            cmbclientes.Text = "";
+            // Limpiar resultados anteriores
+            cmbclientes.Text = string.Empty;
             dgvcliente.DataSource = null;
+            cmbclientes.DataSource = null;
 
-            // Opcional: puedes cambiar el texto que se muestra en la ComboBox como guía
-            if (CBOperacion.SelectedItem.ToString() == "Clientes")
+            if (CBOperacion.SelectedItem == null) return;
+
+            string operacion = CBOperacion.SelectedItem.ToString();
+
+            // Por defecto dejamos el filtro habilitado solo si aplica (Clientes, Maquilas, Movimientos)
+            cboFiltroActivo.SelectedIndex = Math.Min(Math.Max(cboFiltroActivo.SelectedIndex, 0), cboFiltroActivo.Items.Count - 1);
+
+            switch (operacion)
             {
-                cmbclientes.Items.Clear();
-                cmbclientes.Items.Add("Escribe el nombre o ID del cliente"); // guía temporal
-            }
-            else if (CBOperacion.SelectedItem.ToString() == "Facturas")
-            {
-                cmbclientes.Items.Clear();
-                cmbclientes.Items.Add("Escribe número de factura o cliente"); // guía temporal
+                case "Clientes":
+                    cmbclientes.Text = "Escribe Nombre, Identidad o Teléfono...";
+                    cboFiltroActivo.Enabled = true;
+                    break;
+
+                case "Facturas":
+                    cmbclientes.Text = "Escribe Número de Factura o Nombre del Cliente...";
+                    cboFiltroActivo.Enabled = false;
+                    break;
+
+                case "Inventario":
+                    cmbclientes.Text = "Buscar Producto o Categoría (Semilla, Producto)...";
+                    cboFiltroActivo.Enabled = false;
+                    break;
+
+                case "Maquilas":
+                    cmbclientes.Text = "Buscar por Maquila #, Cliente o Producto...";
+                    cboFiltroActivo.Enabled = true; // tu vista de maquilas tiene Estado/EstadoMaquila si quieres mapear
+                    break;
+
+                case "Movimientos":
+                    cmbclientes.Text = "Buscar por Producto, Tipo de Movimiento o Descripción...";
+                    cboFiltroActivo.Enabled = true; // si quieres filtrar por estado, revisa que vista devuelva campo
+                    break;
+
+                default:
+                    cmbclientes.Text = string.Empty;
+                    cboFiltroActivo.Enabled = false;
+                    break;
             }
         }
+
 
         private void BuscarClientePorID(string idCliente)
         {
@@ -251,15 +316,27 @@ namespace Usuario
         }
 
 
-        public void IniciarModoClientes()
+        public void IniciarModoClientes(bool soloClientesYFacturas = false)
         {
             CBOperacion.Items.Clear();
-            CBOperacion.Items.Add("Clientes");
-            CBOperacion.Items.Add("Facturas");
-            CBOperacion.SelectedIndex = 0; // Selecciona Clientes por defecto
 
-            cmbclientes.Text = string.Empty; // limpia el ComboBox
-            dgvcliente.DataSource = null;    // limpia el DataGridView
+            if (soloClientesYFacturas)
+            {
+                CBOperacion.Items.Add("Clientes");
+                CBOperacion.Items.Add("Facturas");
+            }
+            else
+            {
+                CBOperacion.Items.Add("Clientes");
+                CBOperacion.Items.Add("Facturas");
+                CBOperacion.Items.Add("Inventario");
+                CBOperacion.Items.Add("Maquilas");
+                CBOperacion.Items.Add("Movimientos");
+            }
+
+            CBOperacion.SelectedIndex = 0;
+            cmbclientes.Text = string.Empty;
+            dgvcliente.DataSource = null;
         }
 
 
