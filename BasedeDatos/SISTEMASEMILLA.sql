@@ -547,7 +547,8 @@ GO
 INSERT INTO USUARIO (NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, Clave, IDRol)
 VALUES 
 ('0318200601618', 'Melvin', 'Adan', 'Santos', 'Claros', 'melvinandasanto', 1),
-('0000000000000', 'USUARIO', 'de','prueba','programa','12345',1);
+('0000000000000', 'USUARIO', 'de','prueba','programa','12345',1),
+('1234567890123', 'Segundo', 'de','Usuario','Prueba','54321',1);
 GO
 
 UPDATE USUARIO

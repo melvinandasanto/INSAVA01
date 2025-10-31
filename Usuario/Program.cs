@@ -24,7 +24,7 @@ namespace Usuario
             string rutaScript = @"C:\Users\melvi\source\repos\INSAVA\BasedeDatos";
 
             // Crear conexión temporal solo para pruebas
-            var conexion = new ClaseConexion("GOTYPC", "SISTEMASEMILLA");
+            var conexion = new ClaseConexion();
 
             if (!conexion.VerificarServidor())
             {
