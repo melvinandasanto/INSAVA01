@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\EntityFramework.6.5.1\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.5.1\build\EntityFramework.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -54,9 +54,28 @@
     <Reference Include="Microsoft.Configuration.ConfigurationBuilders.UserSecrets, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.3.0.0\lib\Net471\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.150.1652.0\lib\net40\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.150.1652.0\lib\net40\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Design, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.150.1652.0\lib\net40\Microsoft.ReportViewer.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.150.1652.0\lib\net40\Microsoft.ReportViewer.ProcessingObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=15.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.Winforms.150.1652.0\lib\net40\Microsoft.ReportViewer.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.Types.14.0.314.76\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -83,16 +102,88 @@
     <Compile Include="Clases\ClaseTemas.cs" />
     <Compile Include="Clases\ClaseUSUARIO.cs" />
     <Compile Include="Clases\ClaseValidacion.cs" />
+    <Compile Include="Clases\DashboardRepository.cs" />
     <Compile Include="Clases\DiseñoGlobal.cs" />
+    <Compile Include="Clases\IThemedReport.cs" />
     <Compile Include="Clases\Permisos.cs" />
+    <Compile Include="Clases\ReporteHelper.cs" />
     <Compile Include="Clases\ServicioVenta.cs" />
     <Compile Include="Clases\SesionUsuario.cs" />
+    <Compile Include="Clases\ThemeManager.cs" />
+    <Compile Include="Dashboard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dashboard.Designer.cs">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </Compile>
     <Compile Include="FACTURA.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FACTURA.Designer.cs">
       <DependentUpon>FACTURA.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormReporteBajoStock.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteBajoStock.Designer.cs">
+      <DependentUpon>FormReporteBajoStock.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReporteClientes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteClientes.Designer.cs">
+      <DependentUpon>FormReporteClientes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReporteEgresos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteEgresos.Designer.cs">
+      <DependentUpon>FormReporteEgresos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReporteFinancieros.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteFinancieros.Designer.cs">
+      <DependentUpon>FormReporteFinancieros.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReporteInventario.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteInventario.Designer.cs">
+      <DependentUpon>FormReporteInventario.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReporteMaquilas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReporteMaquilas.Designer.cs">
+      <DependentUpon>FormReporteMaquilas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReportes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReportes.Designer.cs">
+      <DependentUpon>FormReportes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormReportesIngresos.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormReportesIngresos.Designer.cs">
+      <DependentUpon>FormReportesIngresos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reportes\DataSetReportes.cs">
+      <DependentUpon>DataSetReportes.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Reportes\DataSetReportes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSetReportes.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SISTEMASEMILLADataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SISTEMASEMILLADataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="UCBUSCADOR.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -160,9 +251,57 @@
     <Compile Include="UCVENTA.Designer.cs">
       <DependentUpon>UCVENTA.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Dashboard.resx">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FACTURA.resx">
       <DependentUpon>FACTURA.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteBajoStock.resx">
+      <DependentUpon>FormReporteBajoStock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteClientes.resx">
+      <DependentUpon>FormReporteClientes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteEgresos.resx">
+      <DependentUpon>FormReporteEgresos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteFinancieros.resx">
+      <DependentUpon>FormReporteFinancieros.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteInventario.resx">
+      <DependentUpon>FormReporteInventario.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReporteMaquilas.resx">
+      <DependentUpon>FormReporteMaquilas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReportes.resx">
+      <DependentUpon>FormReportes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormReportesIngresos.resx">
+      <DependentUpon>FormReportesIngresos.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Reportes\ReporteIngresos.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteEgresos.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteInventario.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteClientes.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteBajoStock.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteMaquilasPendientes.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Reportes\ReporteEstadosFinancieros.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="UCBUSCADOR.resx">
       <DependentUpon>UCBUSCADOR.cs</DependentUpon>
     </EmbeddedResource>
@@ -212,6 +351,28 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Reportes\DataSetReportes.xsc">
+      <DependentUpon>DataSetReportes.xsd</DependentUpon>
+    </None>
+    <None Include="Reportes\DataSetReportes.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSetReportes.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Reportes\DataSetReportes.xss">
+      <DependentUpon>DataSetReportes.xsd</DependentUpon>
+    </None>
+    <None Include="SISTEMASEMILLADataSet.xsc">
+      <DependentUpon>SISTEMASEMILLADataSet.xsd</DependentUpon>
+    </None>
+    <None Include="SISTEMASEMILLADataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SISTEMASEMILLADataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="SISTEMASEMILLADataSet.xss">
+      <DependentUpon>SISTEMASEMILLADataSet.xsd</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -235,6 +396,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Logo.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

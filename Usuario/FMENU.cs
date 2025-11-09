@@ -40,7 +40,7 @@ namespace Usuario
         {
             InitializeComponent();
             maquila = new ClaseMaquila();
-            
+
             // Verificar maquilas vencidas al inicio
             ActualizarEstadosMaquila();
 
@@ -49,6 +49,8 @@ namespace Usuario
             timerVerificacion.Interval = 24 * 60 * 60 * 1000; // 24 horas
             timerVerificacion.Tick += (s, e) => ActualizarEstadosMaquila();
             timerVerificacion.Start();
+
+            this.Shown += FMENU_Shown;
         }
 
         private void ActualizarEstadosMaquila()
@@ -75,7 +77,19 @@ namespace Usuario
             Permisos.AplicarPermisosMenu(this);
 
             AgregarBotonPerfilUsuario();
+            MostrarDashboardInicial();
         }
+
+        private void FMENU_Shown(object sender, EventArgs e)
+        {
+            // 🔹 Asegura que el dashboard ya se mostró
+            if (ucDashboard != null && !ucDashboard.IsDisposed)
+            {
+                // Llamar colore() cuando TODO ya está renderizado
+                ucDashboard.colore();
+            }
+        }
+
 
         protected override void OnLoad(EventArgs e)
         {
@@ -103,6 +117,14 @@ namespace Usuario
                         DiseñoGlobal.AplicarEstiloDataGridView(dgvChild, temaActual);
                 }
             }
+
+            if (ucDashboard != null && !ucDashboard.IsDisposed)
+            {
+                ucDashboard.CambiarTema(temaActual);
+            }
+
+            ThemeManager.SetTheme(temaActual);
+
         }
 
         private void btnCerrar_Click(object sender, EventArgs e)
@@ -340,9 +362,9 @@ namespace Usuario
                 AbrirUserControlExclusivo(ref uccliente, panelContenedor);
             }
         }
-        
-         private void LlamaInventario_Click(object sender, EventArgs e)
-         {
+
+        private void LlamaInventario_Click(object sender, EventArgs e)
+        {
             if (ucproducto != null && panelContenedor.Controls.Contains(ucproducto))
             {
                 panelContenedor.Controls.Remove(ucproducto);
@@ -353,7 +375,7 @@ namespace Usuario
             {
                 AbrirUserControlExclusivo(ref ucproducto, panelContenedor);
             }
-         }
+        }
 
         private void LlamaBuscador_Click(object sender, EventArgs e)
         {
@@ -400,6 +422,63 @@ namespace Usuario
                     DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
             }
         }
-        
+
+        private Dashboard ucDashboard = null;
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            AbrirUserControlExclusivo(ref ucDashboard, panelContenedor);
+        }
+
+        public void MostrarDashboardInicial()
+        {
+            try
+            {
+                // 🔹 Cierra cualquier control que esté abierto en el contenedor
+                foreach (Control ctrl in panelContenedor.Controls.OfType<UserControl>().ToList())
+                {
+                    panelContenedor.Controls.Remove(ctrl);
+                    ctrl.Dispose();
+                }
+
+                // 🔹 Si el Dashboard no existe o fue eliminado, lo crea
+                if (ucDashboard == null || ucDashboard.IsDisposed)
+                {
+                    ucDashboard = new Dashboard();
+                }
+
+                // 🚫 Mover AplicarTema para que no borre los colores luego de colore()
+                ucDashboard.Dock = DockStyle.Fill;
+                panelContenedor.Controls.Add(ucDashboard);
+
+                // 🔹 Aplica el tema general (fondo, fuentes, etc.)
+                DiseñoGlobal.AplicarTema(ucDashboard, temaActual);
+
+                // 🔹 Aplica el estilo a los DataGridView dentro del Dashboard
+                foreach (Control child in ucDashboard.Controls)
+                {
+                    if (child is DataGridView dgv)
+                        DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
+                }
+
+                // 🟩 MUY IMPORTANTE: Pintar los KPI al final, para que no los sobreescriba el tema
+                ucDashboard.colore();
+
+                // 🔹 Refresca todos los datos visuales
+                ucDashboard.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al mostrar el dashboard inicial: " + ex.Message,
+                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //Reportes
+        private FormReportes ucreporte= null;
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            AbrirUserControlExclusivo(ref ucreporte , panelContenedor);
+        }
     }
 }

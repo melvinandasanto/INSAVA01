@@ -65,7 +65,7 @@ namespace Usuario
                 }
                 else return;
             }
-            Application.Run(new FormInicio());
+            Application.Run(new Login());
         }
     }
 }
