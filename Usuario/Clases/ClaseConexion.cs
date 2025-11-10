@@ -21,7 +21,7 @@ namespace Usuario
         /// <summary>
         /// Inicializa una nueva instancia de ClaseConexion.
         /// </summary>
-        public ClaseConexion(string host = "KAA_23\\SQLEXPRESS", string nombreDB = "SISTEMASEMILLA")
+        public ClaseConexion(string host = "MARCELAPACHECO\\MSSQLSERVER05", string nombreDB = "SISTEMASEMILLA")
         {
             _host = host;
             _nombreDB = nombreDB;
