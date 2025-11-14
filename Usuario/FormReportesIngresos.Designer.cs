@@ -29,36 +29,28 @@
         private void InitializeComponent()
         {
             this.reportViewer1 = new Microsoft.Reporting.WinForms.ReportViewer();
-            this.btnExportarPDF = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // reportViewer1
             // 
-            this.reportViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.reportViewer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.reportViewer1.Location = new System.Drawing.Point(0, 0);
+            this.reportViewer1.Margin = new System.Windows.Forms.Padding(4);
             this.reportViewer1.Name = "reportViewer1";
-            this.reportViewer1.Size = new System.Drawing.Size(898, 557);
+            this.reportViewer1.ServerReport.BearerToken = null;
+            this.reportViewer1.Size = new System.Drawing.Size(1197, 696);
             this.reportViewer1.TabIndex = 0;
-            // 
-            // btnExportarPDF
-            // 
-            this.btnExportarPDF.Location = new System.Drawing.Point(21, 488);
-            this.btnExportarPDF.Name = "btnExportarPDF";
-            this.btnExportarPDF.Size = new System.Drawing.Size(162, 57);
-            this.btnExportarPDF.TabIndex = 1;
-            this.btnExportarPDF.Text = "Exportar PDF";
-            this.btnExportarPDF.UseVisualStyleBackColor = true;
-            this.btnExportarPDF.Click += new System.EventHandler(this.btnExportarPDF_Click);
             // 
             // FormReportesIngresos
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(898, 557);
-            this.Controls.Add(this.btnExportarPDF);
             this.Controls.Add(this.reportViewer1);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormReportesIngresos";
-            this.Text = "FormReportes";
+            this.Size = new System.Drawing.Size(1197, 696);
             this.Load += new System.EventHandler(this.FormReportesIngresos_Load);
             this.ResumeLayout(false);
 
@@ -67,6 +59,5 @@
         #endregion
 
         private Microsoft.Reporting.WinForms.ReportViewer reportViewer1;
-        private System.Windows.Forms.Button btnExportarPDF;
     }
 }
