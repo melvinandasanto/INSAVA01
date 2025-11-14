@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Usuario;
-using Usuario.Clases;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Usuario
 {
@@ -21,7 +16,7 @@ namespace Usuario
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Ruta al script de la base de datos
-            string rutaScript = @"C:\Users\cmarc\source\repos\INSAVA01\BasedeDatos";
+            string rutaScript = @"C:\Users\melvi\source\repos\INSAVA01\BasedeDatos";
 
             // Crear conexión temporal solo para pruebas
             var conexion = new ClaseConexion();
@@ -42,7 +37,7 @@ namespace Usuario
                 }
 
                 string rutaCompleta = Path.Combine(rutaScript, "SISTEMASEMILLA.sql");
-                
+
                 if (!File.Exists(rutaCompleta))
                 {
                     MessageBox.Show("No se encontró el archivo de script SQL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -52,15 +47,15 @@ namespace Usuario
                 var respuesta = MessageBox.Show("La base de datos no existe. ¿Deseas crearla?", "No existe", MessageBoxButtons.YesNo);
                 if (respuesta == DialogResult.Yes)
                 {
-                    try 
-                    { 
+                    try
+                    {
                         conexion.CrearBaseDatosSiNoExiste(rutaCompleta);
                         MessageBox.Show("Base de datos creada exitosamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    catch (Exception ex) 
-                    { 
+                    catch (Exception ex)
+                    {
                         MessageBox.Show($"Error al crear la base de datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return; 
+                        return;
                     }
                 }
                 else return;
