@@ -45,23 +45,27 @@ namespace Usuario
             string numeroIdentidad = txtUsuario.Text.Trim();
             string clave = txtContrasena.Text.Trim();
 
-            var usuario = new ClaseUSUARIO();
-            if (usuario.Autenticar(numeroIdentidad, clave) && usuario.Activo)
+            // Usar el servicio de autenticación que registra en la bitácora
+            var loginService = new ClaseLogin();
+            ClaseUSUARIO usuarioDatos;
+            bool esValido = loginService.ValidarUsuario(numeroIdentidad, clave, out usuarioDatos);
+
+            if (esValido && usuarioDatos != null)
             {
-                // Guardar datos de sesión
-                SesionUsuario.IDUsuario = usuario.IDUsuario;
-                SesionUsuario.NombreCompleto = $"{usuario.PrimerNombre} {usuario.PrimerApellido}";
+                // Guardar datos de sesión (usa los datos devueltos por ClaseLogin)
+                SesionUsuario.IDUsuario = usuarioDatos.IDUsuario;
+                SesionUsuario.NombreCompleto = $"{usuarioDatos.PrimerNombre} {usuarioDatos.PrimerApellido}";
 
                 var rol = new ClaseROL();
-                if (rol.BuscarPorId(usuario.IDRol))
+                if (rol.BuscarPorId(usuarioDatos.IDRol))
                 {
-                    MessageBox.Show($"Bienvenido, {usuario.PrimerNombre}! Rol: {rol.NombreRol}");
-                    SesionUsuario.RolNombre = rol.NombreRol; // <--- Agrega esto
+                    SesionUsuario.RolNombre = rol.NombreRol;
+                    MessageBox.Show($"Bienvenido, {usuarioDatos.PrimerNombre}! Rol: {rol.NombreRol}");
                 }
                 else
                 {
-                    MessageBox.Show($"Bienvenido, {usuario.PrimerNombre}! (Rol no encontrado)");
-                    SesionUsuario.RolNombre = ""; // <--- Para evitar null
+                    SesionUsuario.RolNombre = string.Empty;
+                    MessageBox.Show($"Bienvenido, {usuarioDatos.PrimerNombre}! (Rol no encontrado)");
                 }
 
                 // Abrir el menú principal
@@ -71,6 +75,8 @@ namespace Usuario
             }
             else
             {
+                // Intento fallido: ClaseLogin ya registró en la bitácora.
+                // Mantener la lógica de bloqueo por PIN/contador existente.
                 pinLogin.ValidarPinLogin(clave, this, temaActual);
             }
         }

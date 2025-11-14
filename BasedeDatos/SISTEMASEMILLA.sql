@@ -12,6 +12,15 @@ GO
 USE SISTEMASEMILLA;
 GO
 
+
+CREATE TABLE bitacora_accesos (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL,
+    fecha_hora DATETIME NOT NULL,
+    status_usuario VARCHAR(10) NOT NULL,
+    intento_exitoso BIT NOT NULL
+);
+
 ------------------------------------------------------------
 -- 1. CATÁLOGOS BÁSICOS
 ------------------------------------------------------------

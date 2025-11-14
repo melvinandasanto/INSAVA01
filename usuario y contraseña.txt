@@ -1,2 +1,4 @@
 1234567890123 usuario
 54321 contraseña
+
+nota: no guarda el nombre, si no el numero de identidad de quien intento entrar

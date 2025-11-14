@@ -483,6 +483,18 @@ namespace Usuario
             return true;
         }
 
+        private void btnBitacora_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                BitacoraDelUsuario frmBitacora = new BitacoraDelUsuario();
+                frmBitacora.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al abrir la bitácora: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     } // 🔹 Esta llave es la que cierra toda la clase UCUSUARIO
 
 }
