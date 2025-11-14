@@ -16,7 +16,7 @@ namespace Usuario
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Ruta al script de la base de datos
-            string rutaScript = @"C:\Users\melvi\OneDrive\Documentos\Desktop\INSAVA01MELVINCLAROS\BasedeDatos";
+            string rutaScript = @"C:\Users\melvi\source\repos\INSAVA01\BasedeDatos";
 
             // Crear conexión temporal solo para pruebas
             var conexion = new ClaseConexion();
