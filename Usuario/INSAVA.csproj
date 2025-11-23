@@ -224,12 +224,6 @@
     <Compile Include="UCCLIENTE.Designer.cs">
       <DependentUpon>UCCLIENTE.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormInicio.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormInicio.Designer.cs">
-      <DependentUpon>FormInicio.cs</DependentUpon>
-    </Compile>
     <Compile Include="FPERFILUSUARIO.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -338,9 +332,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UCCLIENTE.resx">
       <DependentUpon>UCCLIENTE.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormInicio.resx">
-      <DependentUpon>FormInicio.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FPERFILUSUARIO.resx">
       <DependentUpon>FPERFILUSUARIO.cs</DependentUpon>

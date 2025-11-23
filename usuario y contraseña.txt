@@ -1,4 +1,6 @@
 1234567890123 usuario
 54321 contraseña
 
+la direccion de la base de datos la cambia en el program.cs y la base en la claseconexion
+
 nota: no guarda el nombre, si no el numero de identidad de quien intento entrar
