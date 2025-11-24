@@ -233,7 +233,7 @@
         TSzZyYdm9l+gvXr1UnNzfwFh1y+kJI0v1QAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="toolStripButton1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="LlamaDashboard.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAAHYcAAB2HAY/l8WUAAAHLSURBVGhD7ZlLSsVAEEXfyIm6BT9b8bModexEcKbi7vxs
@@ -247,7 +247,7 @@
         RmMuVqtf2puG1QQqwH0AAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="toolStripButton2.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="LlamaReporte.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAAHYcAAB2HAY/l8WUAAAHfSURBVGhD7ZdBSsRAEEVH8Sx6EU8grl17A1269AS6URfq

@@ -29,6 +29,8 @@ namespace Usuario
         private UCCLIENTE uccliente = null;
         private UCBUSCADOR ucBuscadorClientes = null;
         private Usuario.UCProducto ucproducto = null;
+        private FormReportes ucreporte = null;
+        private Dashboard ucDashboard = null;
 
         // Campo para guardar la referencia al perfil abierto
         private FPERFILUSUARIO perfilAbierto = null;
@@ -327,10 +329,11 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucusuario);
                 ucusuario.Dispose();
                 ucusuario = null;
-                ActualizarVisibilidadLogo();
+                MostrarVisibilidadLogo();
             }
             else
             {
+                EsconderVisibilidadLogo();
                 AbrirUserControlExclusivo(ref ucusuario, panelContenedor);
             }
         }
@@ -342,10 +345,11 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucFVENTA);
                 ucFVENTA.Dispose();
                 ucFVENTA = null;
-                ActualizarVisibilidadLogo();
+                MostrarVisibilidadLogo();
             }
             else
             {
+                EsconderVisibilidadLogo();
                 AbrirUserControlExclusivo(ref ucFVENTA, panelContenedor);
             }
         }
@@ -357,10 +361,11 @@ namespace Usuario
                 panelContenedor.Controls.Remove(uccliente);
                 uccliente.Dispose();
                 uccliente = null;
-                ActualizarVisibilidadLogo();
+                MostrarVisibilidadLogo();
             }
             else
             {
+                EsconderVisibilidadLogo();
                 AbrirUserControlExclusivo(ref uccliente, panelContenedor);
             }
         }
@@ -372,10 +377,11 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucproducto);
                 ucproducto.Dispose();
                 ucproducto = null;
-                ActualizarVisibilidadLogo();
+                MostrarVisibilidadLogo();
             }
             else
             {
+                EsconderVisibilidadLogo();
                 AbrirUserControlExclusivo(ref ucproducto, panelContenedor);
             }
         }
@@ -388,17 +394,47 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucBuscadorClientes);
                 ucBuscadorClientes.Dispose();
                 ucBuscadorClientes = null;
-                ActualizarVisibilidadLogo();
+                MostrarVisibilidadLogo();
             }
             else
             {
-                // Si no está abierto, lo abrimos
+                EsconderVisibilidadLogo();
                 AbrirUserControlExclusivo<UCBUSCADOR>(ref ucBuscadorClientes, panelContenedor);
-                ucBuscadorClientes.IniciarModoClientes(); // inicializa en modo Clientes
+                ucBuscadorClientes.IniciarModoClientes();
             }
         }
 
+        private void LlamaDashboard_Click(object sender, EventArgs e)
+        {
+            if (ucDashboard != null && panelContenedor.Controls.Contains(ucDashboard))
+            {
+                panelContenedor.Controls.Remove(ucDashboard);
+                ucDashboard.Dispose();
+                ucDashboard = null;
+                MostrarVisibilidadLogo();
+            }
+            else
+            {
+                EsconderVisibilidadLogo();
+                AbrirUserControlExclusivo(ref ucDashboard, panelContenedor);
+            }
+        }
 
+        private void LlamaReporte_Click(object sender, EventArgs e)
+        {
+            if (ucreporte != null && panelContenedor.Controls.Contains(ucreporte))
+            {
+                panelContenedor.Controls.Remove(ucreporte);
+                ucreporte.Dispose();
+                ucreporte = null;
+                MostrarVisibilidadLogo();
+            }
+            else
+            {
+                EsconderVisibilidadLogo();
+                AbrirUserControlExclusivo(ref ucreporte, panelContenedor);
+            }
+        }
 
         private void panelContenedor_Paint(object sender, PaintEventArgs e)
         {
@@ -416,13 +452,12 @@ namespace Usuario
             }
 
             // Oculta el logo (si existe) antes de abrir el nuevo UC
-            var logo = ObtenerPictureBoxLogo();
-            if (logo != null) logo.Visible = false;
 
+            EsconderVisibilidadLogo();
             instanciaControl = new T();
 
             // Si el UC se dispone por otro lado, dejamos que restaure la visibilidad del logo
-            instanciaControl.Disposed += (s, e) => ActualizarVisibilidadLogo();
+            instanciaControl.Disposed += (s, e) => MostrarVisibilidadLogo();
 
             DiseñoGlobal.AplicarTema(instanciaControl, temaActual);
             instanciaControl.Dock = DockStyle.Fill;
@@ -435,97 +470,24 @@ namespace Usuario
                     DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
             }
 
-            // Asegura visibilidad correcta (seguridad adicional)
-            ActualizarVisibilidadLogo();
-        }
-
-        private Dashboard ucDashboard = null;
-
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            AbrirUserControlExclusivo(ref ucDashboard, panelContenedor);
-        }
-
-        public void MostrarDashboardInicial()
-        {
-            try
-            {
-                // 🔹 Cierra cualquier control que esté abierto en el contenedor
-                foreach (Control ctrl in panelContenedor.Controls.OfType<UserControl>().ToList())
-                {
-                    panelContenedor.Controls.Remove(ctrl);
-                    ctrl.Dispose();
-                }
-
-                // 🔹 Si el Dashboard no existe o fue eliminado, lo crea
-                if (ucDashboard == null || ucDashboard.IsDisposed)
-                {
-                    ucDashboard = new Dashboard();
-                }
-
-                ucDashboard.Dock = DockStyle.Fill;
-                panelContenedor.Controls.Add(ucDashboard);
-
-                // 🔹 Aplica el tema general (fondo, fuentes, etc.)
-                DiseñoGlobal.AplicarTema(ucDashboard, temaActual);
-
-                // 🔹 Aplica el estilo a los DataGridView dentro del Dashboard
-                foreach (Control child in ucDashboard.Controls)
-                {
-                    if (child is DataGridView dgv)
-                        DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
-                }
-
-                // 🟩 Pintar KPI al final
-                ucDashboard.colore();
-
-                // 🔹 Refresca todos los datos visuales
-                ucDashboard.Refresh();
-
-                // Actualiza visibilidad del logo (si hay dashboard se ocultará)
-                ActualizarVisibilidadLogo();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al mostrar el dashboard inicial: " + ex.Message,
-                                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         //Reportes
-        private FormReportes ucreporte= null;
-        private void toolStripButton2_Click(object sender, EventArgs e)
-        {
-            AbrirUserControlExclusivo(ref ucreporte , panelContenedor);
-        }
+
+        
 
         // Nuevo: busca la PictureBox del logo por varios nombres comunes
-        private PictureBox ObtenerPictureBoxLogo()
-        {
-            var nombres = new[] { "pbLogo", "pictureBoxLogo", "pictureLogo", "picLogo", "pictureBoxEmpresa" };
-            foreach (var name in nombres)
-            {
-                var controles = this.Controls.Find(name, true);
-                if (controles != null && controles.Length > 0 && controles[0] is PictureBox pb)
-                    return pb;
-            }
-            return null;
-        }
+        
 
         // Nuevo: actualiza visibilidad del logo según si hay UserControls en el panel
-        private void ActualizarVisibilidadLogo()
+        private void EsconderVisibilidadLogo()
         {
-            try
-            {
-                var logo = ObtenerPictureBoxLogo();
-                if (logo == null) return;
-                bool tieneUc = panelContenedor != null && panelContenedor.Controls.OfType<UserControl>().Any();
-                logo.Visible = !tieneUc;
-            }
-            catch
-            {
-                // No interrumpir la ejecución por problemas al buscar el logo
-            }
+            PBLOGOINSAVA.Visible = false;
+        }
+
+        private void MostrarVisibilidadLogo()
+        {
+            PBLOGOINSAVA.Visible = true;
         }
     }
 }
