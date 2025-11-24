@@ -40,6 +40,8 @@ namespace Usuario
         {
             Permisos.AplicarPermisos(this);
             DiseñoGlobal.AplicarTamaño(this);
+            CargarFiltro();
+            CargarIdentidades();  // AGREGAR ESTA LÍNEA
             CargarClientes(cboFiltroActivo.SelectedItem?.ToString() ?? "Activos");
             var menu = FindForm() as FMENU;
             if (menu != null)
@@ -52,6 +54,15 @@ namespace Usuario
             CamposLetra.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoLetras(ev));
             CamposNumericos.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoNumerico(ev));
             CombosNumericos.ForEach(combo => combo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoNumerico(ev));
+        }
+
+        private void CargarIdentidades()
+        {
+            DataTable dtClientes = cliente.ObtenerClientes();
+            CBNumeroIdentidad.DataSource = dtClientes;
+            CBNumeroIdentidad.DisplayMember = "NumeroIdentidad";
+            CBNumeroIdentidad.ValueMember = "NumeroIdentidad";
+            CBNumeroIdentidad.SelectedIndex = -1;
         }
 
         private void CargarFiltro()
@@ -159,33 +170,7 @@ namespace Usuario
 
         private void ControlModificado(object sender, EventArgs e)
         {
-            if (valoresOriginales == null)
-            {
-                btnEditar.Enabled = false;
-                btnClean.Text = "Limpiar";
-                return;
-            }
 
-            bool huboCambios =
-                txtId.Text != valoresOriginales["txtId"].ToString() ||
-                CBNumeroIdentidad.Text != valoresOriginales["CBNumeroIdentidad"].ToString() ||
-                txtPrimerNombre.Text != valoresOriginales["txtPrimerNombre"].ToString() ||
-                txtSegundoNombre.Text != valoresOriginales["txtSegundoNombre"].ToString() ||
-                txtPrimerApellido.Text != valoresOriginales["txtPrimerApellido"].ToString() ||
-                txtSegundoApellido.Text != valoresOriginales["txtSegundoApellido"].ToString() ||
-                txtTelefono.Text != valoresOriginales["txtTelefono"].ToString() ||
-                checkactivo.Checked != (bool)valoresOriginales["checkactivo"];
-
-            if (huboCambios)
-            {
-                btnEditar.Enabled = true;
-                btnClean.Text = "Cancelar";
-            }
-            else
-            {
-                btnEditar.Enabled = false;
-                btnClean.Text = "Limpiar";
-            }
         }
 
         private void dataGridViewClientes_SelectionChanged(object sender, EventArgs e)
@@ -469,5 +454,9 @@ namespace Usuario
             return true;
         }
 
+        private void CBNumeroIdentidad_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

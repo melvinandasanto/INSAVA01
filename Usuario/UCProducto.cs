@@ -18,8 +18,7 @@ namespace Usuario
             InitializeComponent();
             producto = new ClasePRODUCTO();
             this.Load += UCProducto_Load;
-            // Asegura que el evento esté asignado
-            this.NUPCantidad.ValueChanged += new System.EventHandler(this.ControlModificado);
+            // Diseño global
             DiseñoGlobal.RegistrarUserControl(this);
         }
 
@@ -28,11 +27,19 @@ namespace Usuario
             txtGerminacion.Enabled = false;
             txtPrecioMaquila.Enabled = false;
 
-            CargarProductos();
+            // Cargar listas y grid usando el filtro por defecto
             CargarProveedores();
             CargarCategorias();
             CargarComboFiltro();
-            CargarProductosFiltro("Activos");
+            // Usar el filtro actual para llenar el grid
+            CargarProductosFiltro(cboFiltroActivo.SelectedItem?.ToString() ?? "Activos");
+
+            // Asegurar que el combo de productos esté poblado
+            CBProducto.DataSource = producto.ObtenerProductos();
+            CBProducto.DisplayMember = "Nombre";
+            CBProducto.ValueMember = "IDProducto";
+            CBProducto.SelectedIndex = -1;
+
             // Eventos para detectar cambios en los campos
             CBCategoria.SelectedIndexChanged += ControlModificado;
             CBProducto.TextChanged += ControlModificado;
@@ -42,16 +49,18 @@ namespace Usuario
             txtPrecioMaquila.TextChanged += ControlModificado;
             CBProveedor.SelectedIndexChanged += ControlModificado;
             checkactivo.CheckedChanged += ControlModificado;
+
             EstadoInicial();
+
             CamposDecimales = new List<TextBox>
             {
                 txtPrecioUnitario,
                 txtGerminacion,
                 txtPrecioMaquila
             };
-            // Fix for the CS7036 error: Pass the required "txt" parameter to the ValidarCampoDecimal method.
             CamposDecimales.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoDecimal(ev, campo));
-            
+
+            // Manejador para habilitar campos dependientes de categoría
             CBCategoria.SelectedIndexChanged += CBCategoria_SelectedIndexChanged;
         }
 
@@ -77,6 +86,7 @@ namespace Usuario
         {
             CBCategoria.Items.Clear();
             CBCategoria.Items.Add("Semilla");
+            CBCategoria.Items.Add("Semilla Maquilada");
             CBCategoria.Items.Add("Producto");
             CBCategoria.SelectedIndex = -1;
         }
@@ -118,7 +128,6 @@ namespace Usuario
             producto.Nombre = CBProducto.Text?.Trim();
             producto.Cantidad = NUPCantidad.Value;
 
-            // Precio: usar InvariantCulture para consistencia con la BD
             string textoPrecio = txtPrecioUnitario.Text.Trim().Replace(',', '.');
             if (!decimal.TryParse(textoPrecio, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal precio))
             {
@@ -127,11 +136,9 @@ namespace Usuario
             }
             producto.PrecioUnitario = Math.Round(precio, 2);
 
-            // Determinar si es semilla (comparación case-insensitive)
             bool esSemilla = string.Equals(producto.Categoria, "Semilla", StringComparison.OrdinalIgnoreCase)
                           || string.Equals(producto.Categoria, "Semilla Maquilada", StringComparison.OrdinalIgnoreCase);
 
-            // Germinación: aceptar "85" -> 0.85 o "0.85"
             if (esSemilla)
             {
                 string textoGerminacion = txtGerminacion.Text?.Trim();
@@ -146,7 +153,6 @@ namespace Usuario
                     MessageBox.Show("La germinación debe ser un número válido (ejemplo: 0.85 o 85).");
                     return;
                 }
-                // interpretar >1 como porcentaje en 0-100
                 if (germ > 1m) germ = germ / 100m;
                 germ = Math.Round(germ, 2);
                 if (germ < 0m || germ > 1m)
@@ -156,7 +162,6 @@ namespace Usuario
                 }
                 producto.PorcentajeGerminacion = germ;
 
-                // Precio de maquila (obligatorio para semilla según restricción DB)
                 string textoPrecioMaquila = txtPrecioMaquila.Text?.Trim();
                 textoPrecioMaquila = textoPrecioMaquila?.Replace(',', '.');
                 if (string.IsNullOrWhiteSpace(textoPrecioMaquila) ||
@@ -173,7 +178,6 @@ namespace Usuario
                 producto.PrecioMaquila = null;
             }
 
-            // Proveedor robusto: manejar DBNull, DataRowView, string o int
             object proveedorValue = CBProveedor.SelectedValue;
             int? idProveedor = null;
             if (proveedorValue == null || proveedorValue == DBNull.Value)
@@ -184,7 +188,7 @@ namespace Usuario
             {
                 idProveedor = intVal;
             }
-            else if (proveedorValue is long longVal) // por si el binding devuelve long
+            else if (proveedorValue is long longVal)
             {
                 idProveedor = (int)longVal;
             }
@@ -203,12 +207,11 @@ namespace Usuario
 
             try
             {
-                // Si producto.Guardar() devuelve bool sin detalle, captura excepción para diagnóstico
                 bool ok = producto.Guardar();
                 if (ok)
                 {
                     MessageBox.Show("Producto guardado correctamente.");
-                    CargarProductos();
+                    CargarProductosFiltro(cboFiltroActivo.SelectedItem?.ToString() ?? "Activos");
                     EstadoInicial();
                     LimpiarCampos();
                 }
@@ -242,7 +245,6 @@ namespace Usuario
             producto.Nombre = CBProducto.Text?.Trim();
             producto.Cantidad = NUPCantidad.Value;
 
-            // Precio
             string textoPrecio = txtPrecioUnitario.Text.Trim().Replace(',', '.');
             if (!decimal.TryParse(textoPrecio, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal precio))
             {
@@ -277,7 +279,6 @@ namespace Usuario
                 }
                 producto.PorcentajeGerminacion = germ;
 
-                // Precio de maquila (obligatorio para semilla)
                 string textoPrecioMaquila = txtPrecioMaquila.Text?.Trim();
                 textoPrecioMaquila = textoPrecioMaquila?.Replace(',', '.');
                 if (string.IsNullOrWhiteSpace(textoPrecioMaquila) ||
@@ -294,7 +295,6 @@ namespace Usuario
                 producto.PrecioMaquila = null;
             }
 
-            // Proveedor
             object proveedorValue = CBProveedor.SelectedValue;
             int? idProveedor = null;
             if (proveedorValue == null || proveedorValue == DBNull.Value)
@@ -328,7 +328,7 @@ namespace Usuario
                 if (resultado)
                 {
                     MessageBox.Show("Producto editado correctamente.");
-                    CargarProductos();
+                    CargarProductosFiltro(cboFiltroActivo.SelectedItem?.ToString() ?? "Activos");
                     btnEditar.Enabled = false;
                     btnClean.Text = "Limpiar";
                     valoresOriginales = null;
@@ -348,7 +348,8 @@ namespace Usuario
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
-            if (btnEliminar.Text == "Cancelar")
+            // Si el usuario estaba en modo editar y quería cancelar, se usa btnClean para esa acción
+            if (btnClean.Text == "Cancelar")
             {
                 RestaurarValoresOriginales();
                 return;
@@ -356,12 +357,18 @@ namespace Usuario
 
             if (string.IsNullOrWhiteSpace(txtId.Text)) return;
 
-            producto.IDProducto = int.Parse(txtId.Text);
+            if (!int.TryParse(txtId.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int idProd))
+            {
+                MessageBox.Show("ID de producto inválido.");
+                return;
+            }
+
+            producto.IDProducto = idProd;
 
             if (producto.Eliminar())
             {
                 MessageBox.Show("Producto eliminado correctamente.");
-                CargarProductos();
+                CargarProductosFiltro(cboFiltroActivo.SelectedItem?.ToString() ?? "Activos");
                 LimpiarCampos();
                 EstadoInicial();
             }
@@ -380,12 +387,13 @@ namespace Usuario
                 return;
             }
 
-            // Buscar el producto por nombre
-            var row = producto.ObtenerProductos().Select($"Nombre = '{nombreProducto.Replace("'", "''")}'");
-            if (row.Length > 0)
+            string filtroActual = cboFiltroActivo.SelectedItem?.ToString() ?? "Activos";
+            DataTable datosConFiltro = ClaseFiltroActivo.FiltrarTabla("PRODUCTO", filtroActual);
+            var rows = datosConFiltro.Select($"Nombre = '{nombreProducto.Replace("'", "''")}'");
+
+            if (rows.Length > 0)
             {
-                // Producto encontrado
-                var data = row[0];
+                var data = rows[0];
                 txtId.Text = data["IDProducto"].ToString();
                 CBCategoria.Text = data["Categoria"].ToString();
                 CBProducto.Text = data["Nombre"].ToString();
@@ -396,7 +404,6 @@ namespace Usuario
                 CBProveedor.SelectedValue = data["IDProveedor"] != DBNull.Value ? (int?)Convert.ToInt32(data["IDProveedor"]) : null;
                 checkactivo.Checked = data["Activo"] != DBNull.Value ? Convert.ToBoolean(data["Activo"]) : false;
 
-                // Guardar valores originales
                 valoresOriginales = new Dictionary<string, object>
                 {
                     { "txtId", txtId.Text },
@@ -410,7 +417,6 @@ namespace Usuario
                     { "checkactivo", checkactivo.Checked }
                 };
 
-                // Habilitar campos para edición (como en UCUSUARIO)
                 CBCategoria.Enabled = true;
                 CBProducto.Enabled = true;
                 NUPCantidad.Enabled = true;
@@ -428,14 +434,13 @@ namespace Usuario
             }
             else
             {
-                // Producto NO encontrado, habilitar para nuevo registro
+                MessageBox.Show($"No existe un producto con este nombre en el filtro '{filtroActual}'. Puede crear uno nuevo o cambiar el filtro.");
                 HabilitarCamposParaNuevoProducto();
                 btnBuscar.Enabled = false;
                 btnGuardar.Enabled = true;
                 btnEditar.Enabled = false;
                 btnEliminar.Enabled = false;
                 btnClean.Text = "Limpiar";
-                MessageBox.Show("No existe un producto con este nombre. Puede crear uno nuevo.");
             }
         }
 
@@ -464,10 +469,27 @@ namespace Usuario
             txtPrecioUnitario.Text = valoresOriginales["txtPrecioUnitario"].ToString();
             txtGerminacion.Text = valoresOriginales["txtGerminacion"].ToString();
             txtPrecioMaquila.Text = valoresOriginales["txtPrecioMaquila"].ToString();
-            CBProveedor.SelectedValue = valoresOriginales["CBProveedor"];
+
+            // Restaurar proveedor robustamente
+            object provVal = valoresOriginales.ContainsKey("CBProveedor") ? valoresOriginales["CBProveedor"] : null;
+            if (provVal == null || provVal == DBNull.Value)
+            {
+                CBProveedor.SelectedIndex = -1;
+            }
+            else
+            {
+                try
+                {
+                    CBProveedor.SelectedValue = provVal;
+                }
+                catch
+                {
+                    CBProveedor.SelectedIndex = -1;
+                }
+            }
+
             checkactivo.Checked = (bool)valoresOriginales["checkactivo"];
 
-            // Habilitar campos para seguir editando tras cancelar (como en UCUSUARIO)
             CBCategoria.Enabled = true;
             CBProducto.Enabled = true;
             NUPCantidad.Enabled = true;
@@ -478,7 +500,7 @@ namespace Usuario
             checkactivo.Enabled = true;
 
             btnEditar.Enabled = false;
-            btnEliminar.Text = "Eliminar";
+            btnClean.Text = "Limpiar";
             btnEliminar.Enabled = true;
             btnGuardar.Enabled = false;
             btnBuscar.Enabled = false;
@@ -500,7 +522,6 @@ namespace Usuario
 
         private void EstadoInicial()
         {
-            // Deshabilitar todos los campos
             CBCategoria.Enabled = false;
             CBProducto.Enabled = true;
             NUPCantidad.Enabled = false;
@@ -535,7 +556,7 @@ namespace Usuario
             if (valoresOriginales == null)
             {
                 btnEditar.Enabled = false;
-                btnEliminar.Text = "Eliminar";
+                btnClean.Text = "Limpiar";
                 return;
             }
 
@@ -554,14 +575,14 @@ namespace Usuario
             if (huboCambios)
             {
                 btnEditar.Enabled = true;
-                btnEliminar.Text = "Cancelar";
+                btnClean.Text = "Cancelar";
                 btnEliminar.Enabled = true;
                 btnGuardar.Enabled = false;
             }
             else
             {
                 btnEditar.Enabled = false;
-                btnEliminar.Text = "Eliminar";
+                btnClean.Text = "Limpiar";
                 btnEliminar.Enabled = true;
                 btnGuardar.Enabled = false;
             }
@@ -598,26 +619,25 @@ namespace Usuario
             using (var formProveedor = new FPROVEEDOR())
             {
                 formProveedor.ShowDialog();
-                // Si quieres recargar la lista de proveedores después de agregar uno nuevo:
                 CargarProveedores();
             }
         }
 
         private void CBCategoria_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string categoria = CBCategoria.Text.Trim();
+            string categoria = CBCategoria.Text?.Trim() ?? string.Empty;
             if (categoria.Equals("Semilla", StringComparison.OrdinalIgnoreCase) ||
                 categoria.Equals("Semilla Maquilada", StringComparison.OrdinalIgnoreCase))
             {
                 txtGerminacion.Enabled = true;
-                txtGerminacion.Text = ""; // Limpia el campo para evitar valores residuales
+                txtGerminacion.Text = "";
                 txtPrecioMaquila.Enabled = true;
                 txtPrecioMaquila.Text = "";
             }
             else
             {
                 txtGerminacion.Enabled = false;
-                txtGerminacion.Text = ""; // Limpia el campo
+                txtGerminacion.Text = "";
                 txtPrecioMaquila.Enabled = false;
                 txtPrecioMaquila.Text = "";
             }

@@ -77,7 +77,6 @@ namespace Usuario
             Permisos.AplicarPermisosMenu(this);
 
             AgregarBotonPerfilUsuario();
-            MostrarDashboardInicial();
         }
 
         private void FMENU_Shown(object sender, EventArgs e)
@@ -328,6 +327,7 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucusuario);
                 ucusuario.Dispose();
                 ucusuario = null;
+                ActualizarVisibilidadLogo();
             }
             else
             {
@@ -342,6 +342,7 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucFVENTA);
                 ucFVENTA.Dispose();
                 ucFVENTA = null;
+                ActualizarVisibilidadLogo();
             }
             else
             {
@@ -356,6 +357,7 @@ namespace Usuario
                 panelContenedor.Controls.Remove(uccliente);
                 uccliente.Dispose();
                 uccliente = null;
+                ActualizarVisibilidadLogo();
             }
             else
             {
@@ -370,6 +372,7 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucproducto);
                 ucproducto.Dispose();
                 ucproducto = null;
+                ActualizarVisibilidadLogo();
             }
             else
             {
@@ -385,6 +388,7 @@ namespace Usuario
                 panelContenedor.Controls.Remove(ucBuscadorClientes);
                 ucBuscadorClientes.Dispose();
                 ucBuscadorClientes = null;
+                ActualizarVisibilidadLogo();
             }
             else
             {
@@ -410,7 +414,16 @@ namespace Usuario
                 contenedor.Controls.Remove(ctrl);
                 ctrl.Dispose();
             }
+
+            // Oculta el logo (si existe) antes de abrir el nuevo UC
+            var logo = ObtenerPictureBoxLogo();
+            if (logo != null) logo.Visible = false;
+
             instanciaControl = new T();
+
+            // Si el UC se dispone por otro lado, dejamos que restaure la visibilidad del logo
+            instanciaControl.Disposed += (s, e) => ActualizarVisibilidadLogo();
+
             DiseñoGlobal.AplicarTema(instanciaControl, temaActual);
             instanciaControl.Dock = DockStyle.Fill;
             contenedor.Controls.Add(instanciaControl);
@@ -421,6 +434,9 @@ namespace Usuario
                 if (child is DataGridView dgv)
                     DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
             }
+
+            // Asegura visibilidad correcta (seguridad adicional)
+            ActualizarVisibilidadLogo();
         }
 
         private Dashboard ucDashboard = null;
@@ -447,7 +463,6 @@ namespace Usuario
                     ucDashboard = new Dashboard();
                 }
 
-                // 🚫 Mover AplicarTema para que no borre los colores luego de colore()
                 ucDashboard.Dock = DockStyle.Fill;
                 panelContenedor.Controls.Add(ucDashboard);
 
@@ -461,11 +476,14 @@ namespace Usuario
                         DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
                 }
 
-                // 🟩 MUY IMPORTANTE: Pintar los KPI al final, para que no los sobreescriba el tema
+                // 🟩 Pintar KPI al final
                 ucDashboard.colore();
 
                 // 🔹 Refresca todos los datos visuales
                 ucDashboard.Refresh();
+
+                // Actualiza visibilidad del logo (si hay dashboard se ocultará)
+                ActualizarVisibilidadLogo();
             }
             catch (Exception ex)
             {
@@ -479,6 +497,35 @@ namespace Usuario
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
             AbrirUserControlExclusivo(ref ucreporte , panelContenedor);
+        }
+
+        // Nuevo: busca la PictureBox del logo por varios nombres comunes
+        private PictureBox ObtenerPictureBoxLogo()
+        {
+            var nombres = new[] { "pbLogo", "pictureBoxLogo", "pictureLogo", "picLogo", "pictureBoxEmpresa" };
+            foreach (var name in nombres)
+            {
+                var controles = this.Controls.Find(name, true);
+                if (controles != null && controles.Length > 0 && controles[0] is PictureBox pb)
+                    return pb;
+            }
+            return null;
+        }
+
+        // Nuevo: actualiza visibilidad del logo según si hay UserControls en el panel
+        private void ActualizarVisibilidadLogo()
+        {
+            try
+            {
+                var logo = ObtenerPictureBoxLogo();
+                if (logo == null) return;
+                bool tieneUc = panelContenedor != null && panelContenedor.Controls.OfType<UserControl>().Any();
+                logo.Visible = !tieneUc;
+            }
+            catch
+            {
+                // No interrumpir la ejecución por problemas al buscar el logo
+            }
         }
     }
 }

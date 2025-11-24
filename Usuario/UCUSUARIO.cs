@@ -50,14 +50,14 @@ namespace Usuario
             else
                 DiseñoGlobal.AplicarEstiloDataGridView(dataGridUsuarios, Temas.Light);
             CamposLetra = new List<TextBox> { txtPrimerNombre, txtSegundoNombre, txtPrimerApellido, txtSegundoApellido };
-            CamposNumericos = new List<ComboBox> { CBRol };
+            CamposNumericos = new List<ComboBox> { CBNumeroIdentidad };
             CamposLetra.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoLetras(ev));
             CamposNumericos.ForEach(campo => campo.KeyPress += (s, ev) => ClaseValidacion.ValidarCampoNumerico(ev));
             foreach (var txt in CamposLetra)
                 txt.TextChanged += ControlModificado;
             txtClave.TextChanged += ControlModificado;
-            CBNOIdentidad.SelectedIndexChanged += ControlModificado;
-            CBRol.TextChanged += ControlModificado;
+            CBRol.SelectedIndexChanged += ControlModificado;
+            CBNumeroIdentidad.TextChanged += ControlModificado;
             checkactivo.CheckedChanged += ControlModificado;
             cboFiltroActivo.SelectedIndexChanged += cboFiltroActivo_SelectedIndexChanged;
             EstadoInicial();
@@ -66,19 +66,19 @@ namespace Usuario
         private void CargarIdentidades()
         {
             DataTable dtUsuarios = usuario.ObtenerUsuarios();
-            CBRol.DataSource = dtUsuarios;
-            CBRol.DisplayMember = "NumeroIdentidad";
-            CBRol.ValueMember = "NumeroIdentidad";
-            CBRol.SelectedIndex = -1;
+            CBNumeroIdentidad.DataSource = dtUsuarios;
+            CBNumeroIdentidad.DisplayMember = "NumeroIdentidad";
+            CBNumeroIdentidad.ValueMember = "NumeroIdentidad";
+            CBNumeroIdentidad.SelectedIndex = -1;
         }
 
         private void CargarRoles()
         {
             DataTable dtRoles = rol.ObtenerRoles();
-            CBNOIdentidad.DataSource = dtRoles;
-            CBNOIdentidad.DisplayMember = "NombreRol";
-            CBNOIdentidad.ValueMember = "IDRol";
-            CBNOIdentidad.SelectedIndex = -1;
+            CBRol.DataSource = dtRoles;
+            CBRol.DisplayMember = "NombreRol";
+            CBRol.ValueMember = "IDRol";
+            CBRol.SelectedIndex = -1;
         }
 
         private void CargarFiltro()
@@ -118,7 +118,7 @@ namespace Usuario
             if (!ValidarCampos())
                 return;
 
-            usuario.NumeroIdentidad = CBRol.Text.Trim();
+            usuario.NumeroIdentidad = CBNumeroIdentidad.Text.Trim();
 
             // Validar duplicado
             if (txtId.Text == "")
@@ -136,7 +136,7 @@ namespace Usuario
             usuario.PrimerApellido = txtPrimerApellido.Text.Trim();
             usuario.SegundoApellido = txtSegundoApellido.Text.Trim();
             usuario.Clave = txtClave.Text.Trim();
-            usuario.IDRol = Convert.ToInt32(CBNOIdentidad.SelectedValue);
+            usuario.IDRol = Convert.ToInt32(CBRol.SelectedValue);
             usuario.Activo = checkactivo.Checked;
 
             // Guardar
@@ -156,7 +156,7 @@ namespace Usuario
 
         private void btnEditar_Click(object sender, EventArgs e)
         {
-            string numeroIdentidad = CBRol.Text.Trim();
+            string numeroIdentidad = CBNumeroIdentidad.Text.Trim();
             var usuarioExistente = usuario.BuscarPorNumeroIdentidad(numeroIdentidad);
             if (usuarioExistente == null)
             {
@@ -171,7 +171,7 @@ namespace Usuario
             usuario.PrimerApellido = txtPrimerApellido.Text.Trim();
             usuario.SegundoApellido = txtSegundoApellido.Text.Trim();
             usuario.Clave = txtClave.Text.Trim();
-            usuario.IDRol = Convert.ToInt32(CBNOIdentidad.SelectedValue);
+            usuario.IDRol = Convert.ToInt32(CBRol.SelectedValue);
             usuario.Activo = checkactivo.Checked;
 
             if (usuario.Editar())
@@ -190,7 +190,7 @@ namespace Usuario
 
         private void btnEliminar_Click(object sender, EventArgs e)
         {
-            string numeroIdentidad = CBRol.Text.Trim();
+            string numeroIdentidad = CBNumeroIdentidad.Text.Trim();
             var usuarioExistente = usuario.BuscarPorNumeroIdentidad(numeroIdentidad);
             if (usuarioExistente == null)
             {
@@ -206,7 +206,7 @@ namespace Usuario
 
         private void btnBuscar_Click(object sender, EventArgs e)
         {
-            string numeroIdentidad = CBRol.Text.Trim();
+            string numeroIdentidad = CBNumeroIdentidad.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(numeroIdentidad))
             {
@@ -229,17 +229,17 @@ namespace Usuario
                 txtPrimerApellido.Text = usuarioEncontrado.PrimerApellido;
                 txtSegundoApellido.Text = usuarioEncontrado.SegundoApellido;
                 txtClave.Text = usuarioEncontrado.Clave;
-                CBNOIdentidad.SelectedValue = usuarioEncontrado.IDRol;
+                CBRol.SelectedValue = usuarioEncontrado.IDRol;
                 checkactivo.Checked = usuarioEncontrado.Activo;
                 txtId.Text = usuarioEncontrado.IDUsuario.ToString();
-                CBRol.Text = usuarioEncontrado.NumeroIdentidad;
+                CBNumeroIdentidad.Text = usuarioEncontrado.NumeroIdentidad;
 
                 txtPrimerNombre.Enabled = true;
                 txtSegundoNombre.Enabled = true;
                 txtPrimerApellido.Enabled = true;
                 txtSegundoApellido.Enabled = true;
                 txtClave.Enabled = true;
-                CBNOIdentidad.Enabled = true;
+                CBRol.Enabled = true;
                 checkactivo.Enabled = true;
 
                 btnEditar.Enabled = false;
@@ -258,13 +258,13 @@ namespace Usuario
                 valoresOriginales = new Dictionary<string, object>
                 {
                     { "txtId", txtId.Text },
-                    { "CBRol", CBRol.Text },
+                    { "CBRol", CBNumeroIdentidad.Text },
                     { "txtPrimerNombre", txtPrimerNombre.Text },
                     { "txtSegundoNombre", txtSegundoNombre.Text },
                     { "txtPrimerApellido", txtPrimerApellido.Text },
                     { "txtSegundoApellido", txtSegundoApellido.Text },
                     { "txtClave", txtClave.Text },
-                    { "CBNOIdentidad", CBNOIdentidad.SelectedValue },
+                    { "CBNOIdentidad", CBRol.SelectedValue },
                     { "checkactivo", checkactivo.Checked }
                 };
             }
@@ -323,13 +323,13 @@ namespace Usuario
                 return;
 
             txtId.Text = valoresOriginales["txtId"].ToString();
-            CBRol.Text = valoresOriginales["CBRol"].ToString();
+            CBNumeroIdentidad.Text = valoresOriginales["CBRol"].ToString();
             txtPrimerNombre.Text = valoresOriginales["txtPrimerNombre"].ToString();
             txtSegundoNombre.Text = valoresOriginales["txtSegundoNombre"].ToString();
             txtPrimerApellido.Text = valoresOriginales["txtPrimerApellido"].ToString();
             txtSegundoApellido.Text = valoresOriginales["txtSegundoApellido"].ToString();
             txtClave.Text = valoresOriginales["txtClave"].ToString();
-            CBNOIdentidad.SelectedValue = valoresOriginales["CBNOIdentidad"];
+            CBRol.SelectedValue = valoresOriginales["CBNOIdentidad"];
             checkactivo.Checked = (bool)valoresOriginales["checkactivo"];
 
             btnEditar.Enabled = false;
@@ -339,13 +339,13 @@ namespace Usuario
         private void LimpiarCampos()
         {
             txtId.Text = "";
-            CBRol.Text = "";
+            CBNumeroIdentidad.Text = "";
             txtPrimerNombre.Text = "";
             txtSegundoNombre.Text = "";
             txtPrimerApellido.Text = "";
             txtSegundoApellido.Text = "";
             txtClave.Text = "";
-            CBNOIdentidad.SelectedIndex = -1;
+            CBRol.SelectedIndex = -1;
             checkactivo.Checked = false;
 
             valoresOriginales = null;
@@ -363,13 +363,13 @@ namespace Usuario
 
             bool huboCambios =
                 txtId.Text != valoresOriginales["txtId"].ToString() ||
-                CBRol.Text != valoresOriginales["CBRol"].ToString() ||
+                CBNumeroIdentidad.Text != valoresOriginales["CBRol"].ToString() ||
                 txtPrimerNombre.Text != valoresOriginales["txtPrimerNombre"].ToString() ||
                 txtSegundoNombre.Text != valoresOriginales["txtSegundoNombre"].ToString() ||
                 txtPrimerApellido.Text != valoresOriginales["txtPrimerApellido"].ToString() ||
                 txtSegundoApellido.Text != valoresOriginales["txtSegundoApellido"].ToString() ||
                 txtClave.Text != valoresOriginales["txtClave"].ToString() ||
-                (CBNOIdentidad.SelectedValue == null ? "" : CBNOIdentidad.SelectedValue.ToString()) !=
+                (CBRol.SelectedValue == null ? "" : CBRol.SelectedValue.ToString()) !=
                     (valoresOriginales["CBNOIdentidad"] == null ? "" : valoresOriginales["CBNOIdentidad"].ToString()) ||
                 checkactivo.Checked != (bool)valoresOriginales["checkactivo"];
 
@@ -398,14 +398,14 @@ namespace Usuario
             txtPrimerApellido.Enabled = false;
             txtSegundoApellido.Enabled = false;
             txtClave.Enabled = false;
-            CBNOIdentidad.Enabled = false;
+            CBRol.Enabled = false;
             checkactivo.Enabled = false;
 
             btnEditar.Enabled = false;
             btnEliminar.Enabled = false;
             btnGuardar.Enabled = false;
 
-            CBRol.Enabled = true;
+            CBNumeroIdentidad.Enabled = true;
             btnBuscar.Enabled = true;
             btnClean.Text = "Limpiar";
             valoresOriginales = null;
@@ -419,7 +419,7 @@ namespace Usuario
             txtPrimerApellido.Enabled = true;
             txtSegundoApellido.Enabled = true;
             txtClave.Enabled = true;
-            CBNOIdentidad.Enabled = true;
+            CBRol.Enabled = true;
             checkactivo.Enabled = true;
 
             btnEditar.Enabled = false;
@@ -438,17 +438,17 @@ namespace Usuario
     private bool ValidarCampos()
         {
             // Validar Número de Identidad
-            if (string.IsNullOrWhiteSpace(CBRol.Text))
+            if (string.IsNullOrWhiteSpace(CBNumeroIdentidad.Text))
             {
                 MessageBox.Show("Debe ingresar el número de identidad.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CBRol.Focus();
+                CBNumeroIdentidad.Focus();
                 return false;
             }
 
-            if (CBRol.Text.Length != 13)
+            if (CBNumeroIdentidad.Text.Length != 13)
             {
                 MessageBox.Show("El número de identidad debe tener exactamente 13 dígitos.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CBRol.Focus();
+                CBNumeroIdentidad.Focus();
                 return false;
             }
 
@@ -473,10 +473,10 @@ namespace Usuario
                 return false;
             }
 
-            if (CBNOIdentidad.SelectedIndex == -1)
+            if (CBRol.SelectedIndex == -1)
             {
                 MessageBox.Show("Debe seleccionar un rol.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CBNOIdentidad.Focus();
+                CBRol.Focus();
                 return false;
             }
 
@@ -494,6 +494,11 @@ namespace Usuario
             {
                 MessageBox.Show("Error al abrir la bitácora: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void CBNumeroIdentidad_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     } // 🔹 Esta llave es la que cierra toda la clase UCUSUARIO
 
