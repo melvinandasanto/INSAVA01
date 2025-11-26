@@ -15,11 +15,11 @@ namespace Usuario
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Ruta al script de la base de datos
-            string rutaScript = @"C:\Users\melvi\source\repos\INSAVA01\BasedeDatos";
+            string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string rutaScriptDir = Path.Combine(userProfile, "source", "repos", "INSAVA01", "BasedeDatos");
+            string rutaCompleta = Path.Combine(rutaScriptDir, "SISTEMASEMILLA.sql");
 
-            // Crear conexión temporal solo para pruebas
-            var conexion = new ClaseConexion();
+            var conexion = new ClaseConexion(); // usa "." o .\SQLEXPRESS según tu instalación
 
             if (!conexion.VerificarServidor())
             {
@@ -29,18 +29,15 @@ namespace Usuario
 
             if (!conexion.VerificarBaseDatos())
             {
-                // Verificar que el script existe
-                if (!Directory.Exists(rutaScript))
+                if (!Directory.Exists(rutaScriptDir))
                 {
-                    MessageBox.Show("No se encontró el directorio con los scripts", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se encontró el directorio de scripts:\n{rutaScriptDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                string rutaCompleta = Path.Combine(rutaScript, "SISTEMASEMILLA.sql");
-
                 if (!File.Exists(rutaCompleta))
                 {
-                    MessageBox.Show("No se encontró el archivo de script SQL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"No se encontró el archivo SQL:\n{rutaCompleta}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -61,9 +58,8 @@ namespace Usuario
                 else return;
             }
 
-            
-
             Application.Run(new Login());
+
         }
     }
 }
