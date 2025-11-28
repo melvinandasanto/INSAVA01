@@ -1,0 +1,8 @@
+  <!-- Copia automática de pdfium.dll nativo desde la carpeta packages al bin (solo para builds x64) -->
+  <Target Name="CopyPdfiumNative" AfterTargets="Build" Condition="'$(Platform)'=='x64'">
+    <ItemGroup>
+      <!-- Busca pdfium.dll en cualquier paquete PdfiumViewer.Native.* dentro de packages -->
+      <PdfiumFiles Include="$(MSBuildProjectDirectory)\..\packages\PdfiumViewer.Native.*\**\pdfium.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PdfiumFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>

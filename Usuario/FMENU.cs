@@ -31,6 +31,7 @@ namespace Usuario
         private Usuario.UCProducto ucproducto = null;
         private FormReportes ucreporte = null;
         private Dashboard ucDashboard = null;
+        private UCMANUAL ucManuales = null;
 
         // Campo para guardar la referencia al perfil abierto
         private FPERFILUSUARIO perfilAbierto = null;
@@ -321,7 +322,54 @@ namespace Usuario
                 : nombre[0].ToString().ToUpper();
         }
 
+        private void panelContenedor_Paint(object sender, PaintEventArgs e)
+        {
+            // evento vacío
+        }
+
+        // Método genérico para abrir un UserControl exclusivo
+        private void AbrirUserControlExclusivo<T>(ref T instanciaControl, Panel contenedor) where T : UserControl, new()
+        {
+            // Cierra y elimina todos los controles existentes en el panel
+            foreach (Control ctrl in contenedor.Controls.OfType<UserControl>().ToList())
+            {
+                contenedor.Controls.Remove(ctrl);
+                ctrl.Dispose();
+            }
+
+            // Oculta el logo (si existe) antes de abrir el nuevo UC
+
+            EsconderVisibilidadLogo();
+            instanciaControl = new T();
+
+            // Si el UC se dispone por otro lado, dejamos que restaure la visibilidad del logo
+            instanciaControl.Disposed += (s, e) => MostrarVisibilidadLogo();
+
+            DiseñoGlobal.AplicarTema(instanciaControl, temaActual);
+            instanciaControl.Dock = DockStyle.Fill;
+            contenedor.Controls.Add(instanciaControl);
+
+            // Aplica el tema a todos los DataGridView hijos del nuevo UserControl
+            foreach (Control child in instanciaControl.Controls)
+            {
+                if (child is DataGridView dgv)
+                    DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
+            }
+
+        }
+
         // === MÉTODOS PARA QUE EL DISEÑADOR NO FALLE ===
+
+        private void EsconderVisibilidadLogo()
+        {
+            PBLOGOINSAVA.Visible = false;
+        }
+
+        private void MostrarVisibilidadLogo()
+        {
+            PBLOGOINSAVA.Visible = true;
+        }
+
         private void LlamaUsuarios_Click(object sender, EventArgs e)
         {
             if (ucusuario != null && panelContenedor.Controls.Contains(ucusuario))
@@ -436,58 +484,22 @@ namespace Usuario
             }
         }
 
-        private void panelContenedor_Paint(object sender, PaintEventArgs e)
+        private void LlamaManuales_Click(object sender, EventArgs e)
         {
-            // evento vacío
-        }
-
-        // Método genérico para abrir un UserControl exclusivo
-        private void AbrirUserControlExclusivo<T>(ref T instanciaControl, Panel contenedor) where T : UserControl, new()
-        {
-            // Cierra y elimina todos los controles existentes en el panel
-            foreach (Control ctrl in contenedor.Controls.OfType<UserControl>().ToList())
+            if (ucManuales != null && panelContenedor.Controls.Contains(ucManuales))
             {
-                contenedor.Controls.Remove(ctrl);
-                ctrl.Dispose();
+                panelContenedor.Controls.Remove(ucreporte);
+                ucManuales.Dispose();
+                ucManuales = null;
+                MostrarVisibilidadLogo();
             }
-
-            // Oculta el logo (si existe) antes de abrir el nuevo UC
-
-            EsconderVisibilidadLogo();
-            instanciaControl = new T();
-
-            // Si el UC se dispone por otro lado, dejamos que restaure la visibilidad del logo
-            instanciaControl.Disposed += (s, e) => MostrarVisibilidadLogo();
-
-            DiseñoGlobal.AplicarTema(instanciaControl, temaActual);
-            instanciaControl.Dock = DockStyle.Fill;
-            contenedor.Controls.Add(instanciaControl);
-
-            // Aplica el tema a todos los DataGridView hijos del nuevo UserControl
-            foreach (Control child in instanciaControl.Controls)
+            else
             {
-                if (child is DataGridView dgv)
-                    DiseñoGlobal.AplicarEstiloDataGridView(dgv, temaActual);
+                EsconderVisibilidadLogo();
+                AbrirUserControlExclusivo(ref ucManuales, panelContenedor);
             }
-
         }
-
-        //Reportes
 
         
-
-        // Nuevo: busca la PictureBox del logo por varios nombres comunes
-        
-
-        // Nuevo: actualiza visibilidad del logo según si hay UserControls en el panel
-        private void EsconderVisibilidadLogo()
-        {
-            PBLOGOINSAVA.Visible = false;
-        }
-
-        private void MostrarVisibilidadLogo()
-        {
-            PBLOGOINSAVA.Visible = true;
-        }
     }
 }

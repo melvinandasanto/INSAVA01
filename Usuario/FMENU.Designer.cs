@@ -30,6 +30,11 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FMENU));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.panelContenedor = new System.Windows.Forms.Panel();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.btnFacturas = new System.Windows.Forms.ToolStripButton();
+            this.PBLOGOINSAVA = new System.Windows.Forms.PictureBox();
+            this.btnClientes = new System.Windows.Forms.ToolStripButton();
             this.LlamaVentas = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
@@ -40,15 +45,11 @@
             this.LlamaBuscador = new System.Windows.Forms.ToolStripButton();
             this.LlamaDashboard = new System.Windows.Forms.ToolStripButton();
             this.LlamaReporte = new System.Windows.Forms.ToolStripButton();
-            this.panelContenedor = new System.Windows.Forms.Panel();
-            this.PBLOGOINSAVA = new System.Windows.Forms.PictureBox();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.btnClientes = new System.Windows.Forms.ToolStripButton();
-            this.btnFacturas = new System.Windows.Forms.ToolStripButton();
+            this.LlamaManuales = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.panelContenedor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PBLOGOINSAVA)).BeginInit();
             this.toolStrip2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PBLOGOINSAVA)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -66,139 +67,28 @@
             this.LlamaUsuario,
             this.LlamaBuscador,
             this.LlamaDashboard,
-            this.LlamaReporte});
+            this.LlamaReporte,
+            this.LlamaManuales});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Padding = new System.Windows.Forms.Padding(0, 0, 4, 0);
             this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.toolStrip1.Size = new System.Drawing.Size(1785, 47);
+            this.toolStrip1.Size = new System.Drawing.Size(1785, 50);
             this.toolStrip1.TabIndex = 15;
             this.toolStrip1.Text = "toolStrip1";
             this.toolStrip1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.toolStrip1_MouseDown);
-            // 
-            // LlamaVentas
-            // 
-            this.LlamaVentas.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LlamaVentas.Image = ((System.Drawing.Image)(resources.GetObject("LlamaVentas.Image")));
-            this.LlamaVentas.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
-            this.LlamaVentas.Name = "LlamaVentas";
-            this.LlamaVentas.Size = new System.Drawing.Size(160, 41);
-            this.LlamaVentas.Text = "Ventas";
-            this.LlamaVentas.Click += new System.EventHandler(this.LlamaVentas_Click);
-            // 
-            // toolStripButton3
-            // 
-            this.toolStripButton3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(46, 41);
-            this.toolStripButton3.Text = "btnCerrar";
-            this.toolStripButton3.Click += new System.EventHandler(this.btnCerrar_Click);
-            // 
-            // toolStripButton5
-            // 
-            this.toolStripButton5.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(46, 41);
-            this.toolStripButton5.Text = "btnMinimizar";
-            this.toolStripButton5.Click += new System.EventHandler(this.Minimizar_Click);
-            // 
-            // CambiaTema
-            // 
-            this.CambiaTema.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.CambiaTema.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.CambiaTema.Image = ((System.Drawing.Image)(resources.GetObject("CambiaTema.Image")));
-            this.CambiaTema.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.CambiaTema.Name = "CambiaTema";
-            this.CambiaTema.Size = new System.Drawing.Size(46, 41);
-            this.CambiaTema.Text = "tsbtnCambiarTema";
-            this.CambiaTema.Click += new System.EventHandler(this.tsbtnCambiarTema_Click);
-            // 
-            // LlamaClientes
-            // 
-            this.LlamaClientes.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LlamaClientes.Image = ((System.Drawing.Image)(resources.GetObject("LlamaClientes.Image")));
-            this.LlamaClientes.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaClientes.Name = "LlamaClientes";
-            this.LlamaClientes.Size = new System.Drawing.Size(180, 41);
-            this.LlamaClientes.Text = "Clientes";
-            this.LlamaClientes.Click += new System.EventHandler(this.LlamaClientes_Click);
-            // 
-            // LlamaInventario
-            // 
-            this.LlamaInventario.Image = ((System.Drawing.Image)(resources.GetObject("LlamaInventario.Image")));
-            this.LlamaInventario.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaInventario.Name = "LlamaInventario";
-            this.LlamaInventario.Size = new System.Drawing.Size(209, 41);
-            this.LlamaInventario.Text = "Inventario";
-            this.LlamaInventario.Click += new System.EventHandler(this.LlamaInventario_Click);
-            // 
-            // LlamaUsuario
-            // 
-            this.LlamaUsuario.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LlamaUsuario.Image = ((System.Drawing.Image)(resources.GetObject("LlamaUsuario.Image")));
-            this.LlamaUsuario.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaUsuario.Name = "LlamaUsuario";
-            this.LlamaUsuario.Size = new System.Drawing.Size(191, 41);
-            this.LlamaUsuario.Text = "Usuarios";
-            this.LlamaUsuario.Click += new System.EventHandler(this.LlamaUsuarios_Click);
-            // 
-            // LlamaBuscador
-            // 
-            this.LlamaBuscador.Image = ((System.Drawing.Image)(resources.GetObject("LlamaBuscador.Image")));
-            this.LlamaBuscador.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaBuscador.Name = "LlamaBuscador";
-            this.LlamaBuscador.Size = new System.Drawing.Size(203, 41);
-            this.LlamaBuscador.Text = "Buscador";
-            this.LlamaBuscador.Click += new System.EventHandler(this.LlamaBuscador_Click);
-            // 
-            // LlamaDashboard
-            // 
-            this.LlamaDashboard.Image = ((System.Drawing.Image)(resources.GetObject("LlamaDashboard.Image")));
-            this.LlamaDashboard.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaDashboard.Name = "LlamaDashboard";
-            this.LlamaDashboard.Size = new System.Drawing.Size(224, 41);
-            this.LlamaDashboard.Text = "Dashboard";
-            this.LlamaDashboard.Click += new System.EventHandler(this.LlamaDashboard_Click);
-            // 
-            // LlamaReporte
-            // 
-            this.LlamaReporte.Image = ((System.Drawing.Image)(resources.GetObject("LlamaReporte.Image")));
-            this.LlamaReporte.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.LlamaReporte.Name = "LlamaReporte";
-            this.LlamaReporte.Size = new System.Drawing.Size(195, 41);
-            this.LlamaReporte.Text = "Reportes";
-            this.LlamaReporte.Click += new System.EventHandler(this.LlamaReporte_Click);
             // 
             // panelContenedor
             // 
             this.panelContenedor.Controls.Add(this.PBLOGOINSAVA);
             this.panelContenedor.Controls.Add(this.toolStrip2);
             this.panelContenedor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelContenedor.Location = new System.Drawing.Point(0, 47);
+            this.panelContenedor.Location = new System.Drawing.Point(0, 50);
             this.panelContenedor.Margin = new System.Windows.Forms.Padding(4);
             this.panelContenedor.Name = "panelContenedor";
-            this.panelContenedor.Size = new System.Drawing.Size(1785, 755);
+            this.panelContenedor.Size = new System.Drawing.Size(1785, 752);
             this.panelContenedor.TabIndex = 18;
             this.panelContenedor.Paint += new System.Windows.Forms.PaintEventHandler(this.panelContenedor_Paint);
-            // 
-            // PBLOGOINSAVA
-            // 
-            this.PBLOGOINSAVA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PBLOGOINSAVA.Image = ((System.Drawing.Image)(resources.GetObject("PBLOGOINSAVA.Image")));
-            this.PBLOGOINSAVA.Location = new System.Drawing.Point(468, 123);
-            this.PBLOGOINSAVA.Name = "PBLOGOINSAVA";
-            this.PBLOGOINSAVA.Size = new System.Drawing.Size(817, 400);
-            this.PBLOGOINSAVA.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.PBLOGOINSAVA.TabIndex = 16;
-            this.PBLOGOINSAVA.TabStop = false;
             // 
             // toolStrip2
             // 
@@ -217,6 +107,24 @@
             this.toolStrip2.Text = "toolStrip2";
             this.toolStrip2.Visible = false;
             // 
+            // btnFacturas
+            // 
+            this.btnFacturas.Name = "btnFacturas";
+            this.btnFacturas.Size = new System.Drawing.Size(46, 41);
+            // 
+            // PBLOGOINSAVA
+            // 
+            this.PBLOGOINSAVA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PBLOGOINSAVA.Image = ((System.Drawing.Image)(resources.GetObject("PBLOGOINSAVA.Image")));
+            this.PBLOGOINSAVA.Location = new System.Drawing.Point(468, 123);
+            this.PBLOGOINSAVA.Name = "PBLOGOINSAVA";
+            this.PBLOGOINSAVA.Size = new System.Drawing.Size(817, 397);
+            this.PBLOGOINSAVA.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PBLOGOINSAVA.TabIndex = 16;
+            this.PBLOGOINSAVA.TabStop = false;
+            // 
             // btnClientes
             // 
             this.btnClientes.Image = ((System.Drawing.Image)(resources.GetObject("btnClientes.Image")));
@@ -225,10 +133,113 @@
             this.btnClientes.Size = new System.Drawing.Size(180, 41);
             this.btnClientes.Text = "Clientes";
             // 
-            // btnFacturas
+            // LlamaVentas
             // 
-            this.btnFacturas.Name = "btnFacturas";
-            this.btnFacturas.Size = new System.Drawing.Size(46, 41);
+            this.LlamaVentas.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LlamaVentas.Image = ((System.Drawing.Image)(resources.GetObject("LlamaVentas.Image")));
+            this.LlamaVentas.ImageTransparentColor = System.Drawing.SystemColors.ActiveBorder;
+            this.LlamaVentas.Name = "LlamaVentas";
+            this.LlamaVentas.Size = new System.Drawing.Size(160, 44);
+            this.LlamaVentas.Text = "Ventas";
+            this.LlamaVentas.Click += new System.EventHandler(this.LlamaVentas_Click);
+            // 
+            // toolStripButton3
+            // 
+            this.toolStripButton3.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
+            this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Name = "toolStripButton3";
+            this.toolStripButton3.Size = new System.Drawing.Size(46, 44);
+            this.toolStripButton3.Text = "btnCerrar";
+            this.toolStripButton3.Click += new System.EventHandler(this.btnCerrar_Click);
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(46, 44);
+            this.toolStripButton5.Text = "btnMinimizar";
+            this.toolStripButton5.Click += new System.EventHandler(this.Minimizar_Click);
+            // 
+            // CambiaTema
+            // 
+            this.CambiaTema.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.CambiaTema.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.CambiaTema.Image = ((System.Drawing.Image)(resources.GetObject("CambiaTema.Image")));
+            this.CambiaTema.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.CambiaTema.Name = "CambiaTema";
+            this.CambiaTema.Size = new System.Drawing.Size(46, 44);
+            this.CambiaTema.Text = "tsbtnCambiarTema";
+            this.CambiaTema.Click += new System.EventHandler(this.tsbtnCambiarTema_Click);
+            // 
+            // LlamaClientes
+            // 
+            this.LlamaClientes.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LlamaClientes.Image = ((System.Drawing.Image)(resources.GetObject("LlamaClientes.Image")));
+            this.LlamaClientes.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaClientes.Name = "LlamaClientes";
+            this.LlamaClientes.Size = new System.Drawing.Size(180, 44);
+            this.LlamaClientes.Text = "Clientes";
+            this.LlamaClientes.Click += new System.EventHandler(this.LlamaClientes_Click);
+            // 
+            // LlamaInventario
+            // 
+            this.LlamaInventario.Image = ((System.Drawing.Image)(resources.GetObject("LlamaInventario.Image")));
+            this.LlamaInventario.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaInventario.Name = "LlamaInventario";
+            this.LlamaInventario.Size = new System.Drawing.Size(209, 44);
+            this.LlamaInventario.Text = "Inventario";
+            this.LlamaInventario.Click += new System.EventHandler(this.LlamaInventario_Click);
+            // 
+            // LlamaUsuario
+            // 
+            this.LlamaUsuario.Font = new System.Drawing.Font("Arial Rounded MT Bold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LlamaUsuario.Image = ((System.Drawing.Image)(resources.GetObject("LlamaUsuario.Image")));
+            this.LlamaUsuario.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaUsuario.Name = "LlamaUsuario";
+            this.LlamaUsuario.Size = new System.Drawing.Size(191, 44);
+            this.LlamaUsuario.Text = "Usuarios";
+            this.LlamaUsuario.Click += new System.EventHandler(this.LlamaUsuarios_Click);
+            // 
+            // LlamaBuscador
+            // 
+            this.LlamaBuscador.Image = ((System.Drawing.Image)(resources.GetObject("LlamaBuscador.Image")));
+            this.LlamaBuscador.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaBuscador.Name = "LlamaBuscador";
+            this.LlamaBuscador.Size = new System.Drawing.Size(203, 44);
+            this.LlamaBuscador.Text = "Buscador";
+            this.LlamaBuscador.Click += new System.EventHandler(this.LlamaBuscador_Click);
+            // 
+            // LlamaDashboard
+            // 
+            this.LlamaDashboard.Image = ((System.Drawing.Image)(resources.GetObject("LlamaDashboard.Image")));
+            this.LlamaDashboard.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaDashboard.Name = "LlamaDashboard";
+            this.LlamaDashboard.Size = new System.Drawing.Size(224, 44);
+            this.LlamaDashboard.Text = "Dashboard";
+            this.LlamaDashboard.Click += new System.EventHandler(this.LlamaDashboard_Click);
+            // 
+            // LlamaReporte
+            // 
+            this.LlamaReporte.Image = ((System.Drawing.Image)(resources.GetObject("LlamaReporte.Image")));
+            this.LlamaReporte.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaReporte.Name = "LlamaReporte";
+            this.LlamaReporte.Size = new System.Drawing.Size(195, 44);
+            this.LlamaReporte.Text = "Reportes";
+            this.LlamaReporte.Click += new System.EventHandler(this.LlamaReporte_Click);
+            // 
+            // LlamaManuales
+            // 
+            this.LlamaManuales.Image = ((System.Drawing.Image)(resources.GetObject("LlamaManuales.Image")));
+            this.LlamaManuales.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.LlamaManuales.Name = "LlamaManuales";
+            this.LlamaManuales.Size = new System.Drawing.Size(201, 44);
+            this.LlamaManuales.Text = "Manuales";
+            this.LlamaManuales.Click += new System.EventHandler(this.LlamaManuales_Click);
             // 
             // FMENU
             // 
@@ -252,9 +263,9 @@
             this.toolStrip1.PerformLayout();
             this.panelContenedor.ResumeLayout(false);
             this.panelContenedor.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PBLOGOINSAVA)).EndInit();
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PBLOGOINSAVA)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -278,5 +289,6 @@
         private System.Windows.Forms.ToolStripButton LlamaDashboard;
         private System.Windows.Forms.ToolStripButton LlamaReporte;
         private System.Windows.Forms.PictureBox PBLOGOINSAVA;
+        private System.Windows.Forms.ToolStripButton LlamaManuales;
     }
 }
