@@ -5,13 +5,4 @@
       <PdfiumFiles Include="$(MSBuildProjectDirectory)\..\packages\PdfiumViewer.Native.*\**\pdfium.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(PdfiumFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
-	  <!-- Copiar carpeta BasedeDatos y ManualDeUsuario al directorio de salida -->
-	  <ItemGroup>
-		  <Content Include="BasedeDatos\**\*">
-			  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		  </Content>
-		  <Content Include="ManualDeUsuario\**\*">
-			  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		  </Content>
-	  </ItemGroup>
   </Target>
