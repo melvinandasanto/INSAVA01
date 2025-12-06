@@ -17,7 +17,6 @@ namespace Usuario
     {
         private bool mouseDentroDelFormulario = false;
         private readonly string nombreCompleto;
-        private readonly string numeroidentidad;
         private Tema temaActual;
 
         public FPERFILUSUARIO(string nombreCompleto, string correo, Tema tema)

@@ -9,7 +9,6 @@ namespace Usuario
     public partial class UCCLIENTE : UserControl
     {
         private ClaseCLIENTE cliente;
-        private ClaseConexion clienteConexion;
         private Dictionary<string, object> valoresOriginales;
         private List<TextBox> CamposLetra;
         private List<ComboBox> CombosNumericos;

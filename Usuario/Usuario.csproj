@@ -1,8 +1,15 @@
-  <!-- Copia automática de pdfium.dll nativo desde la carpeta packages al bin (solo para builds x64) -->
-  <Target Name="CopyPdfiumNative" AfterTargets="Build" Condition="'$(Platform)'=='x64'">
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <!-- Copia automática de pdfium.dll (x86 y x64) al bin -->
+  <Target Name="CopyPdfiumNative" AfterTargets="Build">
     <ItemGroup>
-      <!-- Busca pdfium.dll en cualquier paquete PdfiumViewer.Native.* dentro de packages -->
-      <PdfiumFiles Include="$(MSBuildProjectDirectory)\..\packages\PdfiumViewer.Native.*\**\pdfium.dll" />
+      <PdfiumFiles Include="$(MSBuildProjectDirectory)\..\packages\PdfiumViewer.Native.*\runtimes\win-x64\native\pdfium.dll" Condition="Exists('%(Identity)')" />
+      <PdfiumFiles Include="$(MSBuildProjectDirectory)\..\packages\PdfiumViewer.Native.*\runtimes\win-x86\native\pdfium.dll" Condition="Exists('%(Identity)')" />
     </ItemGroup>
     <Copy SourceFiles="@(PdfiumFiles)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
   </Target>
+</Project>

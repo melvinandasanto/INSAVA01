@@ -9,7 +9,6 @@ namespace Usuario
     public partial class FPROVEEDOR : Form
     {
         private ClasePROVEEDOR proveedor;
-        private ClaseConexion conexion;
         private List<TextBox> CamposLetra;
         private List<TextBox> CamposNumericos;
 

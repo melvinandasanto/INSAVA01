@@ -16,7 +16,6 @@ namespace Usuario
     public partial class Login : Form
     {
         private Tema temaActual = Temas.Light;
-        private Image imagenOriginalLogo;
         private List<PictureBox> imagensimple = new List<PictureBox>();
         private Dictionary<PictureBox, Image> imagenesOriginales = new Dictionary<PictureBox, Image>();
         private ClasePin pinLogin = new ClasePin(4);
