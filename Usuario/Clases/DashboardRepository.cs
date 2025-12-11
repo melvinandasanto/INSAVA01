@@ -66,6 +66,60 @@ namespace Usuario.Clases
             return _conexion.Tabla(sql, p);
         }
 
+        // --- Productos Más y Menos Vendidos ---
+        public DataTable GetProductoMasVendido()
+        {
+            string sql = @"
+            SELECT TOP 1 VP.IDProducto, P.Nombre, SUM(VP.CantidadVendida) AS TotalVendido, 
+                   SUM(VP.TotalVenta) AS TotalValor
+            FROM VENTA_PRODUCTO VP
+            LEFT JOIN PRODUCTO P ON P.IDProducto = VP.IDProducto
+            WHERE VP.Activo = 1
+            GROUP BY VP.IDProducto, P.Nombre
+            ORDER BY SUM(VP.CantidadVendida) DESC";
+            return _conexion.Tabla(sql);
+        }
+
+        public DataTable GetProductoMenosVendido()
+        {
+            string sql = @"
+            SELECT TOP 1 VP.IDProducto, P.Nombre, SUM(VP.CantidadVendida) AS TotalVendido, 
+                   SUM(VP.TotalVenta) AS TotalValor
+            FROM VENTA_PRODUCTO VP
+            LEFT JOIN PRODUCTO P ON P.IDProducto = VP.IDProducto
+            WHERE VP.Activo = 1
+            GROUP BY VP.IDProducto, P.Nombre
+            ORDER BY SUM(VP.CantidadVendida) ASC";
+            return _conexion.Tabla(sql);
+        }
+
+        // --- Estadísticas de Login ---
+        public int GetTotalLoginsSistema()
+        {
+            string sql = "SELECT COUNT(*) FROM bitacora_accesos";
+            return GetIntScalar(sql);
+        }
+
+        public int GetTotalIntentosFallidos()
+        {
+            string sql = "SELECT COUNT(*) FROM bitacora_accesos WHERE intento_exitoso = 0";
+            return GetIntScalar(sql);
+        }
+
+        public DataTable GetLoginsPorUsuario()
+        {
+            string sql = @"
+            SELECT usuario, 
+                   COUNT(*) AS TotalLogins,
+                   SUM(CASE WHEN intento_exitoso = 1 THEN 1 ELSE 0 END) AS LoginsExitosos,
+                   SUM(CASE WHEN intento_exitoso = 0 THEN 1 ELSE 0 END) AS LoginsFallidos,
+                   MAX(fecha_hora) AS UltimoAcceso
+            FROM bitacora_accesos
+            GROUP BY usuario
+            ORDER BY TotalLogins DESC";
+            return _conexion.Tabla(sql);
+        }
+
         // --- Gráficos ---
         public DataTable GetVentasPorMes(int anio = 0) 
         {
@@ -135,7 +189,6 @@ namespace Usuario.Clases
             return _conexion.Tabla(sql, p);
         }
 
-        // Reporte: Egresos por rango de fechas (usa MOVIMIENTO_PRODUCTO con tipo 'Egreso')
         public DataTable GetEgresosPorRango(DateTime desde, DateTime hasta)
         {
             string sql = @"
@@ -152,21 +205,18 @@ namespace Usuario.Clases
             return _conexion.Tabla(sql, p);
         }
 
-        // Reporte: Inventario actual (productos)
         public DataTable GetInventario()
         {
             string sql = "SELECT IDProducto, Categoria, Nombre, Cantidad, PrecioUnitario, Activo FROM PRODUCTO ORDER BY Nombre";
             return _conexion.Tabla(sql);
         }
 
-        // Reporte: Clientes
         public DataTable GetClientes()
         {
             string sql = "SELECT IDCliente, NumeroIdentidad, PrimerNombre, SegundoNombre, PrimerApellido, SegundoApellido, NumTel, Activo FROM CLIENTE ORDER BY PrimerNombre, PrimerApellido";
             return _conexion.Tabla(sql);
         }
 
-        // Reporte: Estados financieros por rango (Ingresos totales, Egresos totales y Balance)
         public DataTable GetEstadosFinancierosPorRango(DateTime desde, DateTime hasta)
         {
             string sql = @"
@@ -187,6 +237,5 @@ namespace Usuario.Clases
     };
             return _conexion.Tabla(sql, p);
         }
-
     }
 }

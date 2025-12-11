@@ -27,12 +27,37 @@ namespace Usuario
             this.Load += Dashboard_Load;
         }
 
+        private void Dashboard_Load(object sender, EventArgs e)
+        {
+            RefrescarTodo();
+
+            lbl1.BackColor = Color.ForestGreen;
+            lbl1.ForeColor = Color.White;
+            lbl2.BackColor = Color.IndianRed;
+            lbl2.ForeColor = Color.White;
+            lbl3.BackColor = Color.SteelBlue;
+            lbl3.ForeColor = Color.White;
+            lbl4.BackColor = Color.Goldenrod;
+            lbl4.ForeColor = Color.White;
+            lblKPI1Titulo.BackColor = Color.Transparent;
+            lblKPI1Valor.BackColor = Color.Transparent;
+            lblKPI2Titulo.BackColor = Color.Transparent;
+            lblKPI2Valor.BackColor = Color.Transparent;
+            lblKPI3Titulo.BackColor = Color.Transparent;
+            lblKPI3Valor.BackColor = Color.Transparent;
+            lblKPI4Titulo.BackColor = Color.Transparent;
+            lblKPI4Valor.BackColor = Color.Transparent;
+
+            IgualarColoresKPI();
+        }
 
         private void RefrescarTodo()
         {
             CargarKPIs();
             CargarGraficos();
             CargarTablasInformativas();
+            CargarProductosMasMenos();
+            CargarEstadisticasLogin();
         }
 
         private void CargarKPIs()
@@ -54,6 +79,85 @@ namespace Usuario
             catch (Exception ex)
             {
                 MessageBox.Show("Error al cargar KPIs: " + ex.Message);
+            }
+        }
+
+        private void CargarProductosMasMenos()
+        {
+            try
+            {
+                // Producto más vendido en panel4
+                DataTable dtMas = _repo.GetProductoMasVendido();
+                if (dtMas != null && dtMas.Rows.Count > 0)
+                {
+                    var r = dtMas.Rows[0];
+                    string nombre = r.Table.Columns.Contains("Nombre") && r["Nombre"] != DBNull.Value ? r["Nombre"].ToString() : "(sin nombre)";
+                    decimal total = r.Table.Columns.Contains("TotalVendido") && r["TotalVendido"] != DBNull.Value ? Convert.ToDecimal(r["TotalVendido"]) : 0m;
+                    label1.Text = $"{nombre}\nVendidas: {total}";
+                }
+                else
+                {
+                    label1.Text = "Sin datos de ventas";
+                }
+
+                label2.Text = "Producto más vendido";
+
+                // Producto menos vendido en panel5
+                DataTable dtMenos = _repo.GetProductoMenosVendido();
+                if (dtMenos != null && dtMenos.Rows.Count > 0)
+                {
+                    var r = dtMenos.Rows[0];
+                    string nombre = r.Table.Columns.Contains("Nombre") && r["Nombre"] != DBNull.Value ? r["Nombre"].ToString() : "(sin nombre)";
+                    decimal total = r.Table.Columns.Contains("TotalVendido") && r["TotalVendido"] != DBNull.Value ? Convert.ToDecimal(r["TotalVendido"]) : 0m;
+                    label8.Text = $"{nombre}\nVendidas: {total}";
+                }
+                else
+                {
+                    label8.Text = "Sin datos de ventas";
+                }
+
+                label4.Text = "Producto menos vendido";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar productos más/menos vendidos: " + ex.Message);
+            }
+        }
+
+        private void CargarEstadisticasLogin()
+        {
+            try
+            {
+                int totalLogins = _repo.GetTotalLoginsSistema();
+                int totalFallidos = _repo.GetTotalIntentosFallidos();
+
+                // Mostrar estadísticas como etiquetas (opcional, en la UI del designer)
+                // Aquí simplemente cargamos el DataGridView
+                var dtUsuarios = _repo.GetLoginsPorUsuario();
+                dataGridViewInicioSesion.DataSource = dtUsuarios;
+
+                if (dataGridViewInicioSesion.Columns.Contains("usuario"))
+                    dataGridViewInicioSesion.Columns["usuario"].HeaderText = "Usuario";
+                if (dataGridViewInicioSesion.Columns.Contains("TotalLogins"))
+                    dataGridViewInicioSesion.Columns["TotalLogins"].HeaderText = "Total";
+                if (dataGridViewInicioSesion.Columns.Contains("LoginsExitosos"))
+                    dataGridViewInicioSesion.Columns["LoginsExitosos"].HeaderText = "Exitosos";
+                if (dataGridViewInicioSesion.Columns.Contains("LoginsFallidos"))
+                    dataGridViewInicioSesion.Columns["LoginsFallidos"].HeaderText = "Fallidos";
+                if (dataGridViewInicioSesion.Columns.Contains("UltimoAcceso"))
+                {
+                    dataGridViewInicioSesion.Columns["UltimoAcceso"].HeaderText = "Último Acceso";
+                    dataGridViewInicioSesion.Columns["UltimoAcceso"].DefaultCellStyle.Format = "g";
+                }
+
+                dataGridViewInicioSesion.ReadOnly = true;
+                dataGridViewInicioSesion.AllowUserToAddRows = false;
+                dataGridViewInicioSesion.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                dataGridViewInicioSesion.AutoResizeColumns();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar estadísticas de login: " + ex.Message);
             }
         }
 
@@ -86,108 +190,28 @@ namespace Usuario
                 foreach (DataRow r in dtVentas.Rows)
                 {
                     string mes = r["Mes"].ToString();
-                    decimal total = Convert.ToDecimal(r["Total"]);
+                    decimal total = 0m;
+                    decimal.TryParse(r["Total"].ToString(), out total);
                     sVentas.Points.AddXY(mes, total);
                 }
 
                 chartVentasMensuales.Series.Add(sVentas);
-                chartVentasMensuales.ChartAreas[0].AxisX.Title = "Mes";
-                chartVentasMensuales.ChartAreas[0].AxisY.Title = "Total Ventas";
-                chartVentasMensuales.ChartAreas[0].AxisX.Interval = 1;
-                chartVentasMensuales.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.LightGray;
-                chartVentasMensuales.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.LightGray;
-
-                // === GRAFICO DE INGRESOS VS EGRESOS (LÍNEAS) ===
-                var dtEgresos = _repo.GetEgresosPorMes();
-                chartIngresosEgresos.Series.Clear();
-                chartIngresosEgresos.Titles.Clear();
-                chartIngresosEgresos.Titles.Add("Ingresos vs Egresos");
-                chartIngresosEgresos.Titles[0].Font = new Font("Segoe UI", 12, FontStyle.Bold);
-                chartIngresosEgresos.BackColor = Color.FromArgb(245, 245, 245);
-                chartIngresosEgresos.ChartAreas[0].BackColor = Color.WhiteSmoke;
-
-                var sIng = new Series("Ingresos")
-                {
-                    ChartType = SeriesChartType.Area,
-                    BorderWidth = 3,
-                    Color = Color.FromArgb(120, Color.ForestGreen),
-                    MarkerStyle = MarkerStyle.Circle,
-                    MarkerSize = 6,
-                    IsValueShownAsLabel = true,
-                    LabelForeColor = Color.ForestGreen
-                };
-
-                var sEgr = new Series("Egresos")
-                {
-                    ChartType = SeriesChartType.Area,
-                    BorderWidth = 3,
-                    Color = Color.FromArgb(120, Color.IndianRed),
-                    MarkerStyle = MarkerStyle.Diamond,
-                    MarkerSize = 6,
-                    IsValueShownAsLabel = true,
-                    LabelForeColor = Color.IndianRed
-                };
-
-                // Unificar por mes
-                foreach (DataRow r in dtVentas.Rows)
-                {
-                    int mesNum = Convert.ToInt32(r["MesNum"]);
-                    string mes = r["Mes"].ToString();
-                    decimal totalVentas = Convert.ToDecimal(r["Total"]);
-
-                    decimal totalEgresos = 0m;
-                    foreach (DataRow er in dtEgresos.Rows)
-                    {
-                        if (Convert.ToInt32(er["MesNum"]) == mesNum)
-                        {
-                            totalEgresos = Convert.ToDecimal(er["TotalEgresos"]);
-                            break;
-                        }
-                    }
-
-                    sIng.Points.AddXY(mes, totalVentas);
-                    sEgr.Points.AddXY(mes, totalEgresos);
-                }
-
-                chartIngresosEgresos.Series.Add(sIng);
-                chartIngresosEgresos.Series.Add(sEgr);
-                chartIngresosEgresos.ChartAreas[0].AxisX.Title = "Mes";
-                chartIngresosEgresos.ChartAreas[0].AxisY.Title = "Cantidad";
-                chartIngresosEgresos.ChartAreas[0].AxisX.MajorGrid.LineColor = Color.LightGray;
-                chartIngresosEgresos.ChartAreas[0].AxisY.MajorGrid.LineColor = Color.LightGray;
-                chartIngresosEgresos.ChartAreas[0].AxisX.Interval = 1;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al cargar gráficos: " + ex.Message);
-
+                MessageBox.Show("Error al cargar gráfico de ventas: " + ex.Message);
             }
         }
-
 
         private void CargarTablasInformativas()
         {
             try
             {
-                dgvUltimasTransacciones.DataSource = _repo.GetUltimasTransacciones(6);
-                dgvBajoStock.DataSource = _repo.GetProductosBajoStock(10m);
-                dgvMaquilasPendientes.DataSource = _repo.GetMaquilasPendientes();
+                var dtUltimas = _repo.GetUltimasTransacciones(6);
+                dgvUltimasTransacciones.DataSource = dtUltimas;
 
-                foreach (DataGridView dgv in new[] { dgvUltimasTransacciones, dgvBajoStock, dgvMaquilasPendientes })
-                {
-                    dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                    dgv.ReadOnly = true;
-                    dgv.EnableHeadersVisualStyles = false;
-                    dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230);
-                    dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
-                    dgv.BackgroundColor = Color.White;
-                    dgv.DefaultCellStyle.BackColor = Color.White;
-                    dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(200, 230, 255);
-                    dgv.DefaultCellStyle.SelectionForeColor = Color.Black;
-                    dgv.BorderStyle = BorderStyle.FixedSingle;
-                    dgv.GridColor = Color.Gainsboro;
-                    dgv.RowHeadersVisible = false;
-                }
+                var dtMaquilas = _repo.GetMaquilasPendientes();
+                dgvMaquilasPendientes.DataSource = dtMaquilas;
             }
             catch (Exception ex)
             {
@@ -226,31 +250,6 @@ namespace Usuario
                 lbl.ForeColor = Color.White;
                 lbl.BorderStyle = BorderStyle.None;
             }
-        }
-
-
-        private void Dashboard_Load(object sender, EventArgs e)
-        {
-            RefrescarTodo();
-          
-                lbl1.BackColor = Color.ForestGreen;
-                lbl1.ForeColor = Color.White;
-                lbl2.BackColor = Color.IndianRed;
-                lbl2.ForeColor = Color.White;
-                lbl3.BackColor = Color.SteelBlue;
-                lbl3.ForeColor = Color.White;
-                lbl4.BackColor = Color.Goldenrod;
-                lbl4.ForeColor = Color.White;
-            lblKPI1Titulo.BackColor = Color.Transparent;
-            lblKPI1Valor.BackColor = Color.Transparent;
-            lblKPI2Titulo.BackColor = Color.Transparent;
-            lblKPI2Valor.BackColor = Color.Transparent;
-            lblKPI3Titulo.BackColor = Color.Transparent;
-            lblKPI3Valor.BackColor = Color.Transparent;
-            lblKPI4Titulo.BackColor = Color.Transparent;
-            lblKPI4Valor.BackColor = Color.Transparent;
-
-            IgualarColoresKPI();
         }
 
         public void colore()
@@ -359,15 +358,12 @@ namespace Usuario
             lblKPI4Valor.BackColor = lbl4.BackColor;
         }
 
-
-
         private void AplicarTemaRecursivo(Control parent, Tema tema)
         {
             foreach (Control ctrl in parent.Controls)
             {
                 if (ctrl is Label lbl)
                 {
-                    
                     if (lbl.Name.StartsWith("lblKPI"))
                     {
                         lbl.BackColor = Color.Transparent;
